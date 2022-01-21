@@ -19,13 +19,13 @@ and
 
 ### Tracks
 
-![Tracks](https://user-images.githubusercontent.com/80630476/150535728-229be646-5a4f-4739-9d4c-e659b4c94b38.png)
+![Tracks](https://user-images.githubusercontent.com/80630476/150603374-d57da39a-471a-4504-a71b-5307f98a2e22.png)
 
 ### Add New Track
 
-![Add New Track](https://user-images.githubusercontent.com/80630476/150593000-50879664-c905-48c8-b0f8-64ff2d79b81f.png)
+![Add New Track](https://user-images.githubusercontent.com/80630476/150603413-131d1f14-3f16-4c6e-b757-df40b5913d70.png)
 
 ### Delete Genre in use
 
-![Genres](https://user-images.githubusercontent.com/80630476/150592907-7dcdd328-821d-46bc-91bb-d047447a59f0.png)
+![Genres](https://user-images.githubusercontent.com/80630476/150603468-6cb8e2e4-fa44-439a-8d62-95842b3ddc2f.png)
 
