@@ -28,3 +28,8 @@ and
 ### Genres
 
 ![Genres](https://user-images.githubusercontent.com/80630476/150535821-7c7b85f5-c959-41d9-bd4a-81fc7501fc95.png)
+
+### Delete Genre in use
+
+![Genres](https://user-images.githubusercontent.com/80630476/150592907-7dcdd328-821d-46bc-91bb-d047447a59f0.png)
+
