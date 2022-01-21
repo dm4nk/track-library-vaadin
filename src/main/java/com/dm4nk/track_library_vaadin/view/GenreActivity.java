@@ -11,15 +11,19 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.theme.Theme;
+import com.vaadin.flow.theme.lumo.Lumo;
 
 @Route("/genres")
 public class GenreActivity extends VerticalLayout {
     private final GenreRepository genreRepository;
     private final Button backButton = new Button("Tracks", VaadinIcon.MUSIC.create());
     private final TextField filter = new TextField("", "Type to filter");
-    private final Button addNewButton = new Button("Add new");
-    private final HorizontalLayout toolBar = new HorizontalLayout(backButton, filter, addNewButton);
+    private final Button addNewButton = new Button("Add", VaadinIcon.ADD_DOCK.create());
+    private final Button toggleButton = new Button(VaadinIcon.MOON.create());
+    private final HorizontalLayout toolBar = new HorizontalLayout();
     private final GenreEditor genreEditor;
     private Grid<Genre> grid = new Grid<>();
 
@@ -27,7 +31,9 @@ public class GenreActivity extends VerticalLayout {
         this.genreRepository = genreRepository;
         this.genreEditor = genreEditor;
 
-        add(toolBar, grid, genreEditor);
+        initToolbar();
+
+        add(toolBar, grid);
 
         filter.setValueChangeMode(ValueChangeMode.EAGER);
         filter.addValueChangeListener(event -> showGenres(event.getValue()));
@@ -38,12 +44,29 @@ public class GenreActivity extends VerticalLayout {
 
         backButton.addClickListener(e -> UI.getCurrent().navigate("/tracks"));
 
-        genreEditor.setChangeHandler(() -> {
-            genreEditor.setVisible(false);
-            showGenres(filter.getValue());
+        genreEditor.setChangeHandler(() -> showGenres(filter.getValue()));
+
+        toggleButton.addClickListener(click -> {
+            ThemeList themeList = UI.getCurrent().getElement().getThemeList();
+
+            if (themeList.contains(Lumo.DARK)) {
+                themeList.remove(Lumo.DARK);
+            } else {
+                themeList.add(Lumo.DARK);
+            }
         });
 
         showGenres("");
+    }
+
+    private void initToolbar() {
+        toolBar.add(backButton, addNewButton);
+        toolBar.addAndExpand(filter);
+        toolBar.add(toggleButton);
+        toolBar.setAlignSelf(Alignment.STRETCH, filter);
+        toolBar.setAlignSelf(Alignment.START, backButton);
+        toolBar.setAlignSelf(Alignment.START, addNewButton);
+        toolBar.setAlignSelf(Alignment.END, toggleButton);
     }
 
     private void initGrid(GenreRepository genreRepository, GenreEditor genreEditor) {

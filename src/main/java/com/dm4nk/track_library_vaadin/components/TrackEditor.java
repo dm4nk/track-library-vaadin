@@ -8,6 +8,7 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyNotifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -24,20 +25,21 @@ import lombok.Setter;
 public class TrackEditor extends FormLayout implements KeyNotifier {
     private final TrackRepository trackRepository;
     private final GenreRepository genreRepository;
-    ComboBox<Genre> genre = new ComboBox<>("genre");
-    private Track track;
-    private TextField name = new TextField("name");
-    private TextField author = new TextField("author");
-    private TextField album = new TextField("album");
-    private TextField duration = new TextField("duration");
-    private Button save = new Button("Save", VaadinIcon.CHECK.create());
-    private Button cancel = new Button("Cancel");
-    private Button delete = new Button("Delete", VaadinIcon.TRASH.create());
-    private HorizontalLayout actions = new HorizontalLayout(save, cancel, delete);
+    private final ComboBox<Genre> genre = new ComboBox<>("genre");
+    private final TextField name = new TextField("name");
+    private final TextField author = new TextField("author");
+    private final TextField album = new TextField("album");
+    private final TextField duration = new TextField("duration");
+    private final Button save = new Button("Save", VaadinIcon.CHECK.create());
+    private final Button cancel = new Button("Cancel");
+    private final Button delete = new Button("Delete", VaadinIcon.TRASH.create());
+    private final HorizontalLayout actions = new HorizontalLayout(save, cancel, delete);
 
-    private BeanValidationBinder<Track> binder = new BeanValidationBinder<>(Track.class);
+    private final BeanValidationBinder<Track> binder = new BeanValidationBinder<>(Track.class);
+    private final Dialog dialog = new Dialog();
     @Setter
     private ChangeHandler changeHandler;
+    private Track track;
 
     public TrackEditor(TrackRepository trackRepository, GenreRepository genreRepository) {
         this.trackRepository = trackRepository;
@@ -54,9 +56,7 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
 
         save.addClickListener(e -> save());
         delete.addClickListener(e -> delete());
-        cancel.addClickListener(e -> setVisible(false));
-
-        setVisible(false);
+        cancel.addClickListener(e -> dialog.close());
     }
 
     private void initBinders(GenreRepository genreRepository) {
@@ -86,7 +86,6 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
 
     public void editTrack(Track newTrack) {
         if (newTrack == null) {
-            setVisible(false);
             return;
         }
 
@@ -98,22 +97,25 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
             this.track = newTrack;
         }
 
-        setVisible(true);
+        dialog.open();
+        dialog.add(this);
 
         name.focus();
     }
 
-    public void delete() {
+    private void delete() {
         binder.setBean(track);
         trackRepository.delete(track);
         changeHandler.onChange();
+        dialog.close();
     }
 
-    public void save() {
+    private void save() {
         if (binder.validate().isOk()) {
             binder.setBean(track);
             trackRepository.save(track);
             changeHandler.onChange();
+            dialog.close();
         }
     }
 
