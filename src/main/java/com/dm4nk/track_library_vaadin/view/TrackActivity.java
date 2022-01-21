@@ -18,15 +18,12 @@ import com.vaadin.flow.router.RouteAlias;
 @RouteAlias("")
 public class TrackActivity extends VerticalLayout {
     private final TrackRepository trackRepository;
-
-    private Grid<Track> grid = new Grid<>();
-
     private final Button backButton = new Button("Genres", VaadinIcon.HEART.create());
     private final TextField filter = new TextField("", "Type to filter");
     private final Button addNewButton = new Button("Add new");
-    private HorizontalLayout toolBar = new HorizontalLayout(backButton, filter, addNewButton);
-
     private final TrackEditor trackEditor;
+    private Grid<Track> grid = new Grid<>();
+    private HorizontalLayout toolBar = new HorizontalLayout(backButton, filter, addNewButton);
 
 
     public TrackActivity(TrackRepository trackRepository, TrackEditor trackEditor) {
@@ -44,7 +41,7 @@ public class TrackActivity extends VerticalLayout {
 
         backButton.addClickListener(e -> UI.getCurrent().navigate("/genres"));
 
-        trackEditor.setChangeHandler(() ->{
+        trackEditor.setChangeHandler(() -> {
             trackEditor.setVisible(false);
             showTracks(filter.getValue());
         });
@@ -65,11 +62,10 @@ public class TrackActivity extends VerticalLayout {
         });
     }
 
-    private void showTracks(String template){
-        if(template.isEmpty()){
+    private void showTracks(String template) {
+        if (template.isEmpty()) {
             grid.setItems(trackRepository.findAll());
-        }
-        else {
+        } else {
             grid.setItems(trackRepository.findAllByNameAlbumAuthorLike(template));
         }
     }

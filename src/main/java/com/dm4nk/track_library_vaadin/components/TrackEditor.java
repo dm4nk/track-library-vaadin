@@ -9,10 +9,8 @@ import com.vaadin.flow.component.KeyNotifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
@@ -26,15 +24,12 @@ import lombok.Setter;
 public class TrackEditor extends FormLayout implements KeyNotifier {
     private final TrackRepository trackRepository;
     private final GenreRepository genreRepository;
-
+    ComboBox<Genre> genre = new ComboBox<>("genre");
     private Track track;
-
     private TextField name = new TextField("name");
     private TextField author = new TextField("author");
     private TextField album = new TextField("album");
     private TextField duration = new TextField("duration");
-    ComboBox<Genre> genre = new ComboBox<>("genre");
-
     private Button save = new Button("Save", VaadinIcon.CHECK.create());
     private Button cancel = new Button("Cancel");
     private Button delete = new Button("Delete", VaadinIcon.TRASH.create());
@@ -43,10 +38,6 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
     private BeanValidationBinder<Track> binder = new BeanValidationBinder<>(Track.class);
     @Setter
     private ChangeHandler changeHandler;
-
-    public interface ChangeHandler{
-        void onChange();
-    }
 
     public TrackEditor(TrackRepository trackRepository, GenreRepository genreRepository) {
         this.trackRepository = trackRepository;
@@ -94,13 +85,13 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
     }
 
     public void editTrack(Track newTrack) {
-        if(newTrack == null){
+        if (newTrack == null) {
             setVisible(false);
             return;
         }
 
-        if(newTrack.getId() != null){
-            this.track= trackRepository.findById(newTrack.getId()).orElse(newTrack);
+        if (newTrack.getId() != null) {
+            this.track = trackRepository.findById(newTrack.getId()).orElse(newTrack);
             binder.setBean(track);
         } else {
             binder.removeBean();
@@ -119,10 +110,14 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
     }
 
     public void save() {
-        if(binder.validate().isOk()){
+        if (binder.validate().isOk()) {
             binder.setBean(track);
             trackRepository.save(track);
             changeHandler.onChange();
         }
+    }
+
+    public interface ChangeHandler {
+        void onChange();
     }
 }

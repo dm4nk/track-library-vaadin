@@ -16,15 +16,12 @@ import com.vaadin.flow.router.Route;
 @Route("/genres")
 public class GenreActivity extends VerticalLayout {
     private final GenreRepository genreRepository;
-
-    private Grid<Genre> grid = new Grid<>();
-
     private final Button backButton = new Button("Tracks", VaadinIcon.MUSIC.create());
     private final TextField filter = new TextField("", "Type to filter");
     private final Button addNewButton = new Button("Add new");
-    private HorizontalLayout toolBar = new HorizontalLayout(backButton, filter, addNewButton);
-
+    private final HorizontalLayout toolBar = new HorizontalLayout(backButton, filter, addNewButton);
     private final GenreEditor genreEditor;
+    private Grid<Genre> grid = new Grid<>();
 
     public GenreActivity(GenreRepository genreRepository, GenreEditor genreEditor) {
         this.genreRepository = genreRepository;
@@ -41,7 +38,7 @@ public class GenreActivity extends VerticalLayout {
 
         backButton.addClickListener(e -> UI.getCurrent().navigate("/tracks"));
 
-        genreEditor.setChangeHandler(() ->{
+        genreEditor.setChangeHandler(() -> {
             genreEditor.setVisible(false);
             showGenres(filter.getValue());
         });
@@ -60,11 +57,10 @@ public class GenreActivity extends VerticalLayout {
         });
     }
 
-    private void showGenres(String template){
-        if(template.isEmpty()){
+    private void showGenres(String template) {
+        if (template.isEmpty()) {
             grid.setItems(genreRepository.findAll());
-        }
-        else {
+        } else {
             grid.setItems(genreRepository.findAllByNameLike(template));
         }
     }

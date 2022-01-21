@@ -4,18 +4,15 @@ import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.repositiry.GenreRepository;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyNotifier;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import com.vaadin.flow.component.button.Button;
 import lombok.Setter;
-import org.hibernate.validator.internal.constraintvalidators.hv.UniqueElementsValidator;
 
 @SpringComponent
 @UIScope
@@ -34,10 +31,6 @@ public class GenreEditor extends FormLayout implements KeyNotifier {
     private BeanValidationBinder<Genre> binder = new BeanValidationBinder<>(Genre.class);
     @Setter
     private ChangeHandler changeHandler;
-
-    public interface ChangeHandler{
-        void onChange();
-    }
 
     public GenreEditor(GenreRepository genreRepository) {
         this.genreRepository = genreRepository;
@@ -64,12 +57,12 @@ public class GenreEditor extends FormLayout implements KeyNotifier {
     }
 
     public void editGenre(Genre newGenre) {
-        if(newGenre == null){
+        if (newGenre == null) {
             setVisible(false);
             return;
         }
 
-        if(newGenre.getId() != null){
+        if (newGenre.getId() != null) {
             this.genre = genreRepository.findById(newGenre.getId()).orElse(newGenre);
         } else {
             this.genre = newGenre;
@@ -83,20 +76,23 @@ public class GenreEditor extends FormLayout implements KeyNotifier {
     }
 
     public void delete() {
-        try{
+        try {
             genreRepository.delete(genre);
             changeHandler.onChange();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
 
         }
 
     }
 
     public void save() {
-        if(binder.validate().isOk()){
+        if (binder.validate().isOk()) {
             genreRepository.save(genre);
             changeHandler.onChange();
         }
+    }
+
+    public interface ChangeHandler {
+        void onChange();
     }
 }
