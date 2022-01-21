@@ -23,7 +23,7 @@ and
 
 ### Add New Track
 
-![Add New Track](https://user-images.githubusercontent.com/80630476/150535879-165b2237-ff6e-4c03-8f76-ca4b2be7b200.png)
+![Add New Track](https://user-images.githubusercontent.com/80630476/150593000-50879664-c905-48c8-b0f8-64ff2d79b81f.png)
 
 ### Genres
 
