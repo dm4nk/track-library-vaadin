@@ -35,6 +35,8 @@ public class Track implements Serializable {
     @ManyToOne
     @NotNull
     Genre genre;
+    @Lob
+    Byte track;
 
     @Builder
     public Track(Integer id, String name, String author, String album, LocalTime duration, Genre genre) {
