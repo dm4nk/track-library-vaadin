@@ -1,6 +1,4 @@
 INSERT INTO genre (name)
-VALUES ('Genre1');
-INSERT INTO genre (name)
 VALUES ('rap');
 INSERT INTO genre (name)
 VALUES ('pop');

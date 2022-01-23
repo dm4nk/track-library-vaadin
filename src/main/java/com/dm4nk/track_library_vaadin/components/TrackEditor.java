@@ -13,12 +13,20 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
+import com.vaadin.flow.data.validator.DateTimeRangeValidator;
 import com.vaadin.flow.data.validator.IntegerRangeValidator;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @SpringComponent
 @UIScope
@@ -29,7 +37,7 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
     private final TextField name = new TextField("name");
     private final TextField author = new TextField("author");
     private final TextField album = new TextField("album");
-    private final TextField duration = new TextField("duration");
+    private final TimePicker duration = new TimePicker();
     private final Button save = new Button("Save", VaadinIcon.CHECK.create());
     private final Button cancel = new Button("Cancel");
     private final Button delete = new Button("Delete", VaadinIcon.TRASH.create());
@@ -47,6 +55,8 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
 
         add(name, author, album, duration, genre, actions);
 
+        initDuration();
+
         initBinders(genreRepository);
 
         save.getElement().getThemeList().add("primary");
@@ -57,6 +67,13 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
         save.addClickListener(e -> save());
         delete.addClickListener(e -> delete());
         cancel.addClickListener(e -> dialog.close());
+    }
+
+    private void initDuration() {
+        duration.setAutoOpen(false);
+        duration.setStep(Duration.ofSeconds(1));
+        duration.setMinTime(LocalTime.of(0, 0, 5));
+        duration.setMaxTime(LocalTime.of(10, 0, 0));
     }
 
     private void initBinders(GenreRepository genreRepository) {
@@ -74,8 +91,11 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
 
         binder.forField(duration)
                 .asRequired("Duration is required")
-                .withConverter(new StringToIntegerConverter("must be a number"))
-                .withValidator(new IntegerRangeValidator("Myst be between 1 and 999", 1, 999))
+                .withValidator(
+                        dur -> dur.isAfter(LocalTime.of(0, 0, 1)) &&
+                        dur.isBefore(LocalTime.of(10, 0, 0)),
+                        "Must be between 00:00:1 and 10:00:00"
+                )
                 .bind(Track::getDuration, Track::setDuration);
 
         genre.setItems(genreRepository.findAll());

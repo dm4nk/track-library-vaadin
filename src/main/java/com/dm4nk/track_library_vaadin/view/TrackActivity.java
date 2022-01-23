@@ -80,7 +80,9 @@ public class TrackActivity extends VerticalLayout {
         grid.addColumn(Track::getName).setSortable(true).setHeader("Name");
         grid.addColumn(Track::getAuthor).setHeader("Author");
         grid.addColumn(Track::getAlbum).setHeader("Album");
-        grid.addColumn(Track::getDuration).setSortable(true).setHeader("Duration");
+        grid.addColumn(Track::getDuration)
+                .setSortable(true)
+                .setHeader("Duration");
         grid.addColumn(Track::getGenre).setSortable(true).setHeader("Genre");
 
         grid.asSingleSelect().addValueChangeListener(event -> {

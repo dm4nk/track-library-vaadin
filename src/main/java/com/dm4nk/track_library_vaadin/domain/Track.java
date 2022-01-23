@@ -8,6 +8,7 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.time.LocalTime;
 
 /**
  * Simple business object representing a Track
@@ -29,15 +30,14 @@ public class Track implements Serializable {
     String author;
     @NotBlank
     String album;
-    @Digits(fraction = 0, integer = 6)
     @NotNull
-    Integer duration;
+    LocalTime duration;
     @ManyToOne
     @NotNull
     Genre genre;
 
     @Builder
-    public Track(Integer id, String name, String author, String album, Integer duration, Genre genre) {
+    public Track(Integer id, String name, String author, String album, LocalTime duration, Genre genre) {
         this.id = id;
         this.name = name;
         this.author = author;
