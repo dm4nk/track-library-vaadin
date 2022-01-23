@@ -4,7 +4,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
-import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -36,15 +35,16 @@ public class Track implements Serializable {
     @NotNull
     Genre genre;
     @Lob
-    Byte track;
+    Byte[] track;
 
     @Builder
-    public Track(Integer id, String name, String author, String album, LocalTime duration, Genre genre) {
+    public Track(Integer id, String name, String author, String album, LocalTime duration, Genre genre, Byte[] track) {
         this.id = id;
         this.name = name;
         this.author = author;
         this.album = album;
         this.duration = duration;
         this.genre = genre;
+        this.track = track;
     }
 }

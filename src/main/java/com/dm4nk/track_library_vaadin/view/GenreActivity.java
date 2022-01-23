@@ -13,7 +13,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 
 @Route("/genres")
@@ -25,7 +24,7 @@ public class GenreActivity extends VerticalLayout {
     private final Button toggleButton = new Button(VaadinIcon.MOON.create());
     private final HorizontalLayout toolBar = new HorizontalLayout();
     private final GenreEditor genreEditor;
-    private Grid<Genre> grid = new Grid<>();
+    private final Grid<Genre> grid = new Grid<>();
 
     public GenreActivity(GenreRepository genreRepository, GenreEditor genreEditor) {
         this.genreRepository = genreRepository;

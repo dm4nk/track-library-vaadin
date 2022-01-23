@@ -1,5 +1,6 @@
 package com.dm4nk.track_library_vaadin.bootstrap;
 
+import com.dm4nk.track_library_vaadin.converters.ByteArrayToWrappedByteArray;
 import com.dm4nk.track_library_vaadin.domain.Track;
 import com.dm4nk.track_library_vaadin.repositiry.GenreRepository;
 import com.dm4nk.track_library_vaadin.repositiry.TrackRepository;
@@ -7,6 +8,9 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -30,10 +34,14 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
      */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        trackRepository.saveAll(getTracks());
+        try {
+            trackRepository.saveAll(getTracks());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    private List<Track> getTracks() {
+    private List<Track> getTracks() throws IOException {
 
         Track track1 = Track.builder()
                 .name("Montero")
@@ -67,12 +75,17 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
                 .genre(genreRepository.findByName("rap").orElse(null))
                 .build();
 
+        String filePath = "src/main/resources/static/tracks/Score.wav";
+
+        byte[] data = Files.readAllBytes(Paths.get(filePath));
+
         Track track5 = Track.builder()
                 .name("Revenge")
                 .author("XXXTENTACION")
                 .album("Revenge")
                 .duration(LocalTime.of(0, 2, 1))
                 .genre(genreRepository.findByName("rap").orElse(null))
+                .track(ByteArrayToWrappedByteArray.convert(data))
                 .build();
 
 

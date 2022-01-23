@@ -1,5 +1,6 @@
 package com.dm4nk.track_library_vaadin.components;
 
+import com.dm4nk.track_library_vaadin.converters.ByteArrayToWrappedByteArray;
 import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.domain.Track;
 import com.dm4nk.track_library_vaadin.repositiry.GenreRepository;
@@ -14,19 +15,17 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.converter.StringToIntegerConverter;
-import com.vaadin.flow.data.validator.DateTimeRangeValidator;
-import com.vaadin.flow.data.validator.IntegerRangeValidator;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 @SpringComponent
 @UIScope
@@ -41,6 +40,8 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
     private final Button save = new Button("Save", VaadinIcon.CHECK.create());
     private final Button cancel = new Button("Cancel");
     private final Button delete = new Button("Delete", VaadinIcon.TRASH.create());
+    private final MemoryBuffer memoryBuffer = new MemoryBuffer();
+    private final Upload upload = new Upload(memoryBuffer);
     private final HorizontalLayout actions = new HorizontalLayout(save, cancel, delete);
 
     private final BeanValidationBinder<Track> binder = new BeanValidationBinder<>(Track.class);
@@ -53,7 +54,7 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
         this.trackRepository = trackRepository;
         this.genreRepository = genreRepository;
 
-        add(name, author, album, duration, genre, actions);
+        add(name, author, album, duration, genre, upload, actions);
 
         initDuration();
 
@@ -67,6 +68,17 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
         save.addClickListener(e -> save());
         delete.addClickListener(e -> delete());
         cancel.addClickListener(e -> dialog.close());
+
+        upload.setAcceptedFileTypes(".wav");
+        upload.addSucceededListener(event -> {
+            InputStream fileData = memoryBuffer.getInputStream();
+
+            try {
+                track.setTrack(ByteArrayToWrappedByteArray.convert(fileData.readAllBytes()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private void initDuration() {
@@ -93,7 +105,7 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
                 .asRequired("Duration is required")
                 .withValidator(
                         dur -> dur.isAfter(LocalTime.of(0, 0, 1)) &&
-                        dur.isBefore(LocalTime.of(10, 0, 0)),
+                                dur.isBefore(LocalTime.of(10, 0, 0)),
                         "Must be between 00:00:1 and 10:00:00"
                 )
                 .bind(Track::getDuration, Track::setDuration);
