@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.dm4nk</groupId>
-    <artifactId>credit-calculator</artifactId>
+    <artifactId>track-library-vaadin</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>track-library-vaadin</name>
     <description>track-library-vaadin</description>
