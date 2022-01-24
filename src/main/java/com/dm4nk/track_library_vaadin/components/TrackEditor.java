@@ -123,12 +123,12 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
 
         if (newTrack.getId() != null) {
             this.track = trackRepository.findById(newTrack.getId()).orElse(newTrack);
-            binder.setBean(track);
         } else {
             binder.removeBean();
             this.track = newTrack;
         }
 
+        binder.setBean(track);
         dialog.open();
         dialog.add(this);
 
@@ -136,7 +136,6 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
     }
 
     private void delete() {
-        binder.setBean(track);
         trackRepository.delete(track);
         changeHandler.onChange();
         dialog.close();
@@ -144,7 +143,6 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
 
     private void save() {
         if (binder.validate().isOk()) {
-            binder.setBean(track);
             trackRepository.save(track);
             changeHandler.onChange();
             dialog.close();
