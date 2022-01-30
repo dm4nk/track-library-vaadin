@@ -4,8 +4,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalTime;
 
@@ -19,20 +17,21 @@ import java.time.LocalTime;
 @ToString
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@EqualsAndHashCode
 public class Track implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
-    @NotBlank
+    //@NotBlank
     String name;
-    @NotBlank
+    //@NotBlank
     String author;
-    @NotBlank
+    //@NotBlank
     String album;
-    @NotNull
+    //@NotNull
     LocalTime duration;
     @ManyToOne
-    @NotNull
+    //@NotNull
     Genre genre;
     @Lob
     Byte[] track;

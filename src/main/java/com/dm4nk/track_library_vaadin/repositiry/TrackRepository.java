@@ -17,4 +17,7 @@ public interface TrackRepository extends JpaRepository<Track, Integer> {
             "t.author like %?1% or " +
             "t.genre.name like %?1%")
     List<Track> findAllByNameAlbumAuthorLike(String template);
+
+    @Query("select t from Track t left join t.genre where t.genre.name = ?1")
+    List<Track> findByGenre(String genre);
 }
