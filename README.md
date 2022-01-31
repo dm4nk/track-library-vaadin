@@ -19,7 +19,7 @@ and
 
 ### Tracks
 
-![Tracks](https://user-images.githubusercontent.com/80630476/150698632-1365b47e-ece9-4f6b-844b-2170fdb41556.png)
+![Tracks](https://user-images.githubusercontent.com/80630476/151863905-6ae8702b-d3f6-424a-bca2-ebdb1ec8a8ed.png)
 
 ### Genres
 
