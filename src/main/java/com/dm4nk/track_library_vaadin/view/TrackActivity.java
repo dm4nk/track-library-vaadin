@@ -1,5 +1,6 @@
 package com.dm4nk.track_library_vaadin.view;
 
+import com.dm4nk.track_library_vaadin.components.ShowGenresComponent;
 import com.dm4nk.track_library_vaadin.components.ShowTracksOfGenreComponent;
 import com.dm4nk.track_library_vaadin.components.TrackEditor;
 import com.dm4nk.track_library_vaadin.components.utility.ToolBar;
@@ -32,12 +33,12 @@ import java.util.List;
 
 @Route("/tracks")
 @RouteAlias("")
-
 public class TrackActivity extends VerticalLayout {
     private final TrackRepository trackRepository;
 
     private final TrackEditor trackEditor;
     private final ShowTracksOfGenreComponent showTracksOfGenreComponent;
+    private final ShowGenresComponent showGenresComponent;
 
     private final Grid<Track> grid = new Grid<>();
     private final Notification downloadNotification = new Notification();
@@ -45,10 +46,11 @@ public class TrackActivity extends VerticalLayout {
     private final Notification notFoundNotification = new Notification();
     private ToolBar toolBar = null;
 
-    public TrackActivity(TrackRepository trackRepository, TrackEditor trackEditor, ShowTracksOfGenreComponent showTracksOfGenreComponent) {
+    public TrackActivity(TrackRepository trackRepository, TrackEditor trackEditor, ShowTracksOfGenreComponent showTracksOfGenreComponent, ShowGenresComponent showGenresComponent) {
         this.trackRepository = trackRepository;
         this.trackEditor = trackEditor;
         this.showTracksOfGenreComponent = showTracksOfGenreComponent;
+        this.showGenresComponent = showGenresComponent;
 
         configureNotification();
 
@@ -57,14 +59,14 @@ public class TrackActivity extends VerticalLayout {
                 VaadinIcon.HEART,
                 event -> showTracks((String) event.getValue()),
                 event -> trackEditor.editTrack(Track.builder().build()),
-                e -> UI.getCurrent().navigate("/genres"),
+                event -> showGenresComponent.initComponent(),
                 click -> showTracks(toolBar.getFilter().getValue()));
 
         add(toolBar, createGrid());
 
-        trackEditor.setChangeHandler(() -> showTracks(toolBar.getFilter().getValue()));
-
-        showTracksOfGenreComponent.setClickHandler(trackId -> toolBar.getFilter().setValue("id:" + trackId));
+        this.trackEditor.setChangeHandler(() -> showTracks(toolBar.getFilter().getValue()));
+        this.showTracksOfGenreComponent.setClickHandler(trackId -> toolBar.getFilter().setValue("id:" + trackId));
+        this.showGenresComponent.getGenreEditor().setChangeHandler(() -> showTracks(toolBar.getFilter().getValue()));
 
         showTracks("");
     }

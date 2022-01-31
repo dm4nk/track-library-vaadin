@@ -32,7 +32,6 @@ public class ToolBar extends HorizontalLayout {
         backButton = new Button(backButtonText, backButtonIcon.create());
 
         filter.setValueChangeMode(ValueChangeMode.EAGER);
-
         filter.addValueChangeListener(onFilterChangeListener);
         addNewButton.addClickListener(onAddClick);
         backButton.addClickListener(onBackClick);

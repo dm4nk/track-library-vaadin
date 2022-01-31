@@ -26,7 +26,7 @@ public class Genre implements Serializable {
     @Column(unique = true)
     @NotEmpty
     String name;
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     Set<Track> tracks = new HashSet<>();
 
     @Builder

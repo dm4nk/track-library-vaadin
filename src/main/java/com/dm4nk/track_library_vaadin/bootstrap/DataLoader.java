@@ -15,7 +15,6 @@ import java.nio.file.Paths;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Class meant to load data t database
@@ -36,13 +35,13 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         try {
-            getTracks();
+            loadData();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private List<Track> getTracks() throws IOException {
+    private void loadData() throws IOException {
 
         Genre rap = genreRepository.findByName("rap").orElse(null);
         Genre russian = genreRepository.findByName("русская").orElse(null);
@@ -108,7 +107,5 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
         russian.getTracks().add(track2);
 
         genreRepository.saveAll(Arrays.asList(pop, rap, russian));
-
-        return new ArrayList<>(Arrays.asList(track1, track2, track3, track4, track5));
     }
 }
