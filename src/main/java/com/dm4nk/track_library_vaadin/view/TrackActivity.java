@@ -2,6 +2,7 @@ package com.dm4nk.track_library_vaadin.view;
 
 import com.dm4nk.track_library_vaadin.components.ShowTracksOfGenreComponent;
 import com.dm4nk.track_library_vaadin.components.TrackEditor;
+import com.dm4nk.track_library_vaadin.components.utility.ToolBar;
 import com.dm4nk.track_library_vaadin.converters.WrappedByteArrayToByteArray;
 import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.domain.Track;
@@ -30,75 +31,48 @@ import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.flow.theme.lumo.Lumo;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.tools.Tool;
 import java.io.ByteArrayInputStream;
 
 @Slf4j
 
 @Route("/tracks")
 @RouteAlias("")
-@SpringComponent
-@UIScope
+
 public class TrackActivity extends VerticalLayout {
     private final TrackRepository trackRepository;
-    private final Button backButton = new Button("Genres", VaadinIcon.HEART.create());
-    private final TextField filter = new TextField("", "Type to filter");
-    private final Button addNewButton = new Button("Add", VaadinIcon.ADD_DOCK.create());
-    private final Button toggleButton = new Button(VaadinIcon.MOON.create());
 
     private final TrackEditor trackEditor;
     private final ShowTracksOfGenreComponent showTracksOfGenreComponent;
 
     private final Grid<Track> grid = new Grid<>();
-    private final HorizontalLayout toolBar = new HorizontalLayout();
     private final Notification notification = new Notification();
+    private ToolBar toolBar = null;
 
     public TrackActivity(TrackRepository trackRepository, TrackEditor trackEditor, ShowTracksOfGenreComponent showTracksOfGenreComponent) {
         this.trackRepository = trackRepository;
         this.trackEditor = trackEditor;
         this.showTracksOfGenreComponent = showTracksOfGenreComponent;
 
-        initToolbar();
+        configureNotification();
 
-        initGrid(trackRepository);
+        toolBar = new ToolBar(
+                "Genres",
+                VaadinIcon.HEART,
+                event -> showTracks((String) event.getValue()),
+                event -> trackEditor.editTrack(Track.builder().build()),
+                e -> UI.getCurrent().navigate("/genres"),
+                click -> showTracks(toolBar.getFilter().getValue()));
 
-        initNotification();
+        add(toolBar, createGrid());
 
-        add(toolBar, grid);
-
-        filter.setValueChangeMode(ValueChangeMode.EAGER);
-        filter.addValueChangeListener(event -> showTracks(event.getValue()));
-
-        addNewButton.addClickListener(event -> trackEditor.editTrack(Track.builder().build()));
-
-        backButton.addClickListener(e -> UI.getCurrent().navigate("/genres"));
-
-        trackEditor.setChangeHandler(() -> showTracks(filter.getValue()));
-        showTracksOfGenreComponent.setClickHandler(this::showTracks);
-
-        toggleButton.addClickListener(click -> {
-            ThemeList themeList = UI.getCurrent().getElement().getThemeList();
-
-            if (themeList.contains(Lumo.DARK)) {
-                themeList.remove(Lumo.DARK);
-            } else {
-                themeList.add(Lumo.DARK);
-            }
-        });
+        trackEditor.setChangeHandler(() -> showTracks(toolBar.getFilter().getValue()));
+        showTracksOfGenreComponent.setClickHandler(toolBar.getFilter()::setValue);
 
         showTracks("");
     }
 
-    private void initToolbar() {
-        toolBar.add(backButton, addNewButton);
-        toolBar.addAndExpand(filter);
-        toolBar.add(toggleButton);
-        toolBar.setAlignSelf(Alignment.STRETCH, filter);
-        toolBar.setAlignSelf(Alignment.START, backButton);
-        toolBar.setAlignSelf(Alignment.START, addNewButton);
-        toolBar.setAlignSelf(Alignment.END, toggleButton);
-    }
-
-    private void initGrid(TrackRepository trackRepository) {
+    private Grid<Track> createGrid() {
         grid.setItems(trackRepository.findAll());
         grid.addColumn(Track::getName).setSortable(true).setHeader("Name");
         grid.addColumn(Track::getAuthor).setHeader("Author");
@@ -123,9 +97,11 @@ public class TrackActivity extends VerticalLayout {
                 .setHeader("Download");
 
         grid.asSingleSelect().addValueChangeListener(event -> trackEditor.editTrack(event.getValue()));
+
+        return grid;
     }
 
-    private void initNotification() {
+    private void configureNotification() {
         notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
         notification.setPosition(Notification.Position.BOTTOM_CENTER);
         notification.setDuration(1200);

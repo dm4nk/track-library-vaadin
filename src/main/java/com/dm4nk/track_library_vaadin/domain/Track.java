@@ -2,10 +2,14 @@ package com.dm4nk.track_library_vaadin.domain;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalTime;
+import java.util.Objects;
 
 /**
  * Simple business object representing a Track
@@ -17,21 +21,20 @@ import java.time.LocalTime;
 @ToString
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@EqualsAndHashCode
 public class Track implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
-    //@NotBlank
+    @NotBlank
     String name;
-    //@NotBlank
+    @NotBlank
     String author;
-    //@NotBlank
+    @NotBlank
     String album;
-    //@NotNull
+    @NotNull
     LocalTime duration;
     @ManyToOne
-    //@NotNull
+    @NotNull
     Genre genre;
     @Lob
     Byte[] track;
@@ -45,5 +48,18 @@ public class Track implements Serializable {
         this.duration = duration;
         this.genre = genre;
         this.track = track;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Track track = (Track) o;
+        return id != null && Objects.equals(id, track.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return 0;
     }
 }

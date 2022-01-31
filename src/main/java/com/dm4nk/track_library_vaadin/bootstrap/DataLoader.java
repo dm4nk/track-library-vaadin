@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -98,6 +98,6 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
                 .track(ByteArrayToWrappedByteArray.convert(dataRevenge))
                 .build();
 
-        return new LinkedList<>(Arrays.asList(track1, track2, track3, track4, track5));
+        return new ArrayList<>(Arrays.asList(track1, track2, track3, track4, track5));
     }
 }

@@ -1,6 +1,7 @@
 package com.dm4nk.track_library_vaadin.view;
 
 import com.dm4nk.track_library_vaadin.components.GenreEditor;
+import com.dm4nk.track_library_vaadin.components.utility.ToolBar;
 import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.repositiry.GenreRepository;
 import com.vaadin.flow.component.UI;
@@ -18,57 +19,30 @@ import com.vaadin.flow.theme.lumo.Lumo;
 @Route("/genres")
 public class GenreActivity extends VerticalLayout {
     private final GenreRepository genreRepository;
-    private final Button backButton = new Button("Tracks", VaadinIcon.MUSIC.create());
-    private final TextField filter = new TextField("", "Type to filter");
-    private final Button addNewButton = new Button("Add", VaadinIcon.ADD_DOCK.create());
-    private final Button toggleButton = new Button(VaadinIcon.MOON.create());
-    private final HorizontalLayout toolBar = new HorizontalLayout();
     private final GenreEditor genreEditor;
     private final Grid<Genre> grid = new Grid<>();
+    private ToolBar toolBar = null;
 
     public GenreActivity(GenreRepository genreRepository, GenreEditor genreEditor) {
         this.genreRepository = genreRepository;
         this.genreEditor = genreEditor;
+        this.toolBar = new ToolBar(
+                "Tracks",
+                VaadinIcon.MUSIC,
+                event -> showGenres((String) event.getValue()),
+                event -> genreEditor.editGenre(Genre.builder().build()),
+                event -> UI.getCurrent().navigate("/tracks"),
+                event -> showGenres(toolBar.getFilter().getValue())
+        );
 
-        initToolbar();
+        add(toolBar, createGrid());
 
-        add(toolBar, grid);
-
-        filter.setValueChangeMode(ValueChangeMode.EAGER);
-        filter.addValueChangeListener(event -> showGenres(event.getValue()));
-
-        initGrid(genreRepository, genreEditor);
-
-        addNewButton.addClickListener(event -> genreEditor.editGenre(Genre.builder().build()));
-
-        backButton.addClickListener(e -> UI.getCurrent().navigate("/tracks"));
-
-        genreEditor.setChangeHandler(() -> showGenres(filter.getValue()));
-
-        toggleButton.addClickListener(click -> {
-            ThemeList themeList = UI.getCurrent().getElement().getThemeList();
-
-            if (themeList.contains(Lumo.DARK)) {
-                themeList.remove(Lumo.DARK);
-            } else {
-                themeList.add(Lumo.DARK);
-            }
-        });
+        genreEditor.setChangeHandler(() -> showGenres(toolBar.getFilter().getValue()));
 
         showGenres("");
     }
 
-    private void initToolbar() {
-        toolBar.add(backButton, addNewButton);
-        toolBar.addAndExpand(filter);
-        toolBar.add(toggleButton);
-        toolBar.setAlignSelf(Alignment.STRETCH, filter);
-        toolBar.setAlignSelf(Alignment.START, backButton);
-        toolBar.setAlignSelf(Alignment.START, addNewButton);
-        toolBar.setAlignSelf(Alignment.END, toggleButton);
-    }
-
-    private void initGrid(GenreRepository genreRepository, GenreEditor genreEditor) {
+    private Grid<Genre> createGrid() {
         grid.setItems(genreRepository.findAll());
         grid.addColumn(Genre::getName)
                 .setSortable(true)
@@ -77,6 +51,8 @@ public class GenreActivity extends VerticalLayout {
         grid.asSingleSelect().addValueChangeListener(event -> {
             genreEditor.editGenre(event.getValue());
         });
+
+        return grid;
     }
 
     private void showGenres(String template) {
