@@ -9,6 +9,7 @@ import com.vaadin.flow.spring.annotation.UIScope;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 
 @SpringComponent
 @UIScope
@@ -31,13 +32,13 @@ public class ShowTracksOfGenreComponent extends FormLayout {
             Track track = event.getItem();
 
             if (track != null) {
-                clickHandler.onClick(event.getItem().getName());
+                clickHandler.onClick(event.getItem().getId());
                 dialog.close();
             }
         });
     }
 
-    public void initComponent(List<Track> trackList) {
+    public void initComponent(Set<Track> trackList) {
         grid = new Grid<>();
         removeAll();
         add(grid);
@@ -50,6 +51,6 @@ public class ShowTracksOfGenreComponent extends FormLayout {
     }
 
     public interface ClickHandler {
-        void onClick(String track);
+        void onClick(Integer trackId);
     }
 }

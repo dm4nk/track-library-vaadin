@@ -7,7 +7,7 @@ import org.hibernate.Hibernate;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Simple business object representing a Genre
@@ -25,6 +25,8 @@ public class Genre implements Serializable {
     @Column(unique = true)
     @NotEmpty
     String name;
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    Set<Track> tracks = new HashSet<>();
 
     @Builder
     public Genre(Integer id, String name) {
@@ -40,13 +42,16 @@ public class Genre implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Genre genre = (Genre) o;
-        return id != null && Objects.equals(id, genre.id);
+        if (!(o instanceof Genre genre)) return false;
+
+        if (!Objects.equals(id, genre.id)) return false;
+        return Objects.equals(name, genre.name);
     }
 
     @Override
     public int hashCode() {
-        return 0;
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
     }
 }

@@ -58,7 +58,7 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
 
         initDuration();
 
-        initBinders(genreRepository);
+        initBinders();
 
         save.getElement().getThemeList().add("primary");
         delete.getElement().getThemeList().add("error");
@@ -88,7 +88,7 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
         duration.setMaxTime(LocalTime.of(10, 0, 0));
     }
 
-    private void initBinders(GenreRepository genreRepository) {
+    private void initBinders() {
         binder.forField(name)
                 .asRequired("Name is required")
                 .bind(Track::getName, Track::setName);
@@ -110,7 +110,6 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
                 )
                 .bind(Track::getDuration, Track::setDuration);
 
-        genre.setItems(genreRepository.findAll());
         binder.forField(genre)
                 .asRequired("Genre is required")
                 .bind(Track::getGenre, Track::setGenre);
@@ -128,6 +127,7 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
             this.track = newTrack;
         }
 
+        genre.setItems(genreRepository.findAll());
         binder.setBean(track);
         dialog.open();
         dialog.add(this);
@@ -136,6 +136,7 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
     }
 
     private void delete() {
+        track.getGenre().getTracks().remove(track);
         trackRepository.delete(track);
         changeHandler.onChange();
         dialog.close();
@@ -144,6 +145,7 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
     private void save() {
         if (binder.validate().isOk()) {
             trackRepository.save(track);
+            track.getGenre().getTracks().add(track);
             changeHandler.onChange();
             dialog.close();
         }

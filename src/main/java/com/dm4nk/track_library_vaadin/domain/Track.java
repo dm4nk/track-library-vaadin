@@ -53,13 +53,24 @@ public class Track implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Track track = (Track) o;
-        return id != null && Objects.equals(id, track.id);
+        if (!(o instanceof Track track)) return false;
+
+        if (!Objects.equals(id, track.id)) return false;
+        if (!Objects.equals(name, track.name)) return false;
+        if (!Objects.equals(author, track.author)) return false;
+        if (!Objects.equals(album, track.album)) return false;
+        if (!Objects.equals(duration, track.duration)) return false;
+        return Objects.equals(genre, track.genre);
     }
 
     @Override
     public int hashCode() {
-        return 0;
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (author != null ? author.hashCode() : 0);
+        result = 31 * result + (album != null ? album.hashCode() : 0);
+        result = 31 * result + (duration != null ? duration.hashCode() : 0);
+        result = 31 * result + (genre != null ? genre.hashCode() : 0);
+        return result;
     }
 }

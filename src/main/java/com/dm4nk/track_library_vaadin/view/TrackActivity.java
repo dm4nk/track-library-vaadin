@@ -15,24 +15,18 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.dom.ThemeList;
+import com.vaadin.flow.router.NotFoundException;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.StreamRegistration;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinSession;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
-import com.vaadin.flow.theme.lumo.Lumo;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.tools.Tool;
 import java.io.ByteArrayInputStream;
+import java.util.List;
 
 @Slf4j
 
@@ -46,7 +40,9 @@ public class TrackActivity extends VerticalLayout {
     private final ShowTracksOfGenreComponent showTracksOfGenreComponent;
 
     private final Grid<Track> grid = new Grid<>();
-    private final Notification notification = new Notification();
+    private final Notification downloadNotification = new Notification();
+    private final Notification numberFormatNotification = new Notification();
+    private final Notification notFoundNotification = new Notification();
     private ToolBar toolBar = null;
 
     public TrackActivity(TrackRepository trackRepository, TrackEditor trackEditor, ShowTracksOfGenreComponent showTracksOfGenreComponent) {
@@ -67,7 +63,8 @@ public class TrackActivity extends VerticalLayout {
         add(toolBar, createGrid());
 
         trackEditor.setChangeHandler(() -> showTracks(toolBar.getFilter().getValue()));
-        showTracksOfGenreComponent.setClickHandler(toolBar.getFilter()::setValue);
+
+        showTracksOfGenreComponent.setClickHandler(trackId ->  toolBar.getFilter().setValue("id:" + trackId));
 
         showTracks("");
     }
@@ -102,14 +99,24 @@ public class TrackActivity extends VerticalLayout {
     }
 
     private void configureNotification() {
-        notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-        notification.setPosition(Notification.Position.BOTTOM_CENTER);
-        notification.setDuration(1200);
+        downloadNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        downloadNotification.setPosition(Notification.Position.BOTTOM_CENTER);
+        downloadNotification.setDuration(1200);
+
+        numberFormatNotification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        numberFormatNotification.setPosition(Notification.Position.BOTTOM_CENTER);
+        numberFormatNotification.setText("Wrong id format");
+        numberFormatNotification.setDuration(1200);
+
+        notFoundNotification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
+        notFoundNotification.setPosition(Notification.Position.BOTTOM_CENTER);
+        notFoundNotification.setText("No Track with such id");
+        notFoundNotification.setDuration(1200);
     }
 
     private void download(Track track) {
-        notification.setText("Downloading " + track.getName());
-        notification.open();
+        downloadNotification.setText("Downloading " + track.getName());
+        downloadNotification.open();
 
         final StreamResource resource = new StreamResource(track.getName() + ".wav",
                 () -> new ByteArrayInputStream(WrappedByteArrayToByteArray.convert(track.getTrack())));
@@ -118,16 +125,43 @@ public class TrackActivity extends VerticalLayout {
     }
 
     private void showTracks(String template) {
+        try{
+            grid.setItems(findTracksByTemplate(template));
+        }
+        catch (NumberFormatException e){
+            numberFormatNotification.open();
+        }
+        catch (NotFoundException e){
+            notFoundNotification.open();
+        }
+    }
+
+    private List<Track> findTracksByTemplate(String template){
         if (template.isEmpty()) {
-            grid.setItems(trackRepository.findAll());
+            return trackRepository.findAll();
         } else {
-            grid.setItems(trackRepository.findAllByNameAlbumAuthorLike(template));
+            if(template.startsWith("id:")){
+                String idstr = template.substring(3);
+
+                if(idstr.isEmpty())
+                    return trackRepository.findAll();
+
+                Integer id = Integer.parseInt(idstr);
+
+                Track track = trackRepository.findById(id).orElse(null);
+
+                if(track == null) throw new NotFoundException("No track with such id");
+
+                return List.of(track);
+            } else {
+                return trackRepository.findAllByNameAlbumAuthorLike(template);
+            }
         }
     }
 
     private void showTracksOfGenre(Genre genre) {
         showTracksOfGenreComponent.initComponent(
-                trackRepository.findByGenre(genre.getName())
+                genre.getTracks()
         );
     }
 }

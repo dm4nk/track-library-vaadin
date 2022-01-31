@@ -1,6 +1,7 @@
 package com.dm4nk.track_library_vaadin.bootstrap;
 
 import com.dm4nk.track_library_vaadin.converters.ByteArrayToWrappedByteArray;
+import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.domain.Track;
 import com.dm4nk.track_library_vaadin.repositiry.GenreRepository;
 import com.dm4nk.track_library_vaadin.repositiry.TrackRepository;
@@ -35,13 +36,17 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         try {
-            trackRepository.saveAll(getTracks());
+            getTracks();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private List<Track> getTracks() throws IOException {
+
+        Genre rap = genreRepository.findByName("rap").orElse(null);
+        Genre russian = genreRepository.findByName("русская").orElse(null);
+        Genre pop = genreRepository.findByName("pop").orElse(null);
 
         String filePathMontero = "src/main/resources/static/tracks/MONTERO.wav";
         byte[] dataMontero = Files.readAllBytes(Paths.get(filePathMontero));
@@ -50,7 +55,7 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
                 .author("Lil Nas X")
                 .album("Montero")
                 .duration(LocalTime.of(0, 2, 18))
-                .genre(genreRepository.findByName("rap").orElse(null))
+                .genre(rap)
                 .track(ByteArrayToWrappedByteArray.convert(dataMontero))
                 .build();
 
@@ -61,7 +66,7 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
                 .author("Лизер")
                 .album("Молодость, Ч.1")
                 .duration(LocalTime.of(0, 3, 40))
-                .genre(genreRepository.findByName("русская").orElse(null))
+                .genre(russian)
                 .track(ByteArrayToWrappedByteArray.convert(dataCosmos))
                 .build();
 
@@ -72,7 +77,7 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
                 .author("The Score")
                 .album("Atlas")
                 .duration(LocalTime.of(0, 3, 52))
-                .genre(genreRepository.findByName("pop").orElse(null))
+                .genre(pop)
                 .track(ByteArrayToWrappedByteArray.convert(dataRevolution))
                 .build();
 
@@ -83,7 +88,7 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
                 .author("Lil Peep")
                 .album("crybaby")
                 .duration(LocalTime.of(0, 2, 39))
-                .genre(genreRepository.findByName("rap").orElse(null))
+                .genre(rap)
                 .track(ByteArrayToWrappedByteArray.convert(dataDriveway))
                 .build();
 
@@ -94,9 +99,15 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
                 .author("XXXTENTACION")
                 .album("Revenge")
                 .duration(LocalTime.of(0, 2, 1))
-                .genre(genreRepository.findByName("rap").orElse(null))
+                .genre(rap)
                 .track(ByteArrayToWrappedByteArray.convert(dataRevenge))
                 .build();
+
+        pop.getTracks().add(track3);
+        rap.getTracks().addAll(Arrays.asList(track1, track4, track5));
+        russian.getTracks().add(track2);
+
+        genreRepository.saveAll(Arrays.asList(pop, rap, russian));
 
         return new ArrayList<>(Arrays.asList(track1, track2, track3, track4, track5));
     }
