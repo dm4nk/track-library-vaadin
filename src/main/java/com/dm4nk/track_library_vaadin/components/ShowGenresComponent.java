@@ -1,7 +1,7 @@
 package com.dm4nk.track_library_vaadin.components;
 
 import com.dm4nk.track_library_vaadin.domain.Genre;
-import com.dm4nk.track_library_vaadin.repositiry.GenreRepository;
+import com.dm4nk.track_library_vaadin.service.GenreService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
@@ -18,7 +18,7 @@ import lombok.Getter;
 @UIScope
 public class ShowGenresComponent extends VerticalLayout {
     private final Dialog dialog = new Dialog();
-    private final GenreRepository genreRepository;
+    private final GenreService genreService;
     private Grid<Genre> grid;
     @Getter
     private final GenreEditor genreEditor;
@@ -27,8 +27,8 @@ public class ShowGenresComponent extends VerticalLayout {
     private final TextField filter = new TextField("", "Type to filter");
     private final HorizontalLayout toolbar = new HorizontalLayout();
 
-    public ShowGenresComponent(GenreRepository genreRepository, GenreEditor genreEditor) {
-        this.genreRepository = genreRepository;
+    public ShowGenresComponent(GenreService genreService, GenreEditor genreEditor) {
+        this.genreService = genreService;
         this.genreEditor = genreEditor;
         setWidth("600px");
         setHeight("400px");
@@ -54,7 +54,7 @@ public class ShowGenresComponent extends VerticalLayout {
     }
 
     private void showGenres(String template){
-        grid.setItems(genreRepository.findAllByNameLike(template));
+        grid.setItems(genreService.findAllByNameLike(template));
     }
 
     public void initComponent() {

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,9 +15,7 @@ import java.util.Optional;
  */
 @Repository
 public interface GenreRepository extends JpaRepository<Genre, Integer> {
-    //@Transactional
-    //@CacheEvict(value = "genres", allEntries = true)
-    List<Genre> findAll() throws DataAccessException;
+    List<Genre> findAll();
 
     /**
      * Retrieve {@link Genre} from data store with given name

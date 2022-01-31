@@ -5,6 +5,8 @@ import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.domain.Track;
 import com.dm4nk.track_library_vaadin.repositiry.GenreRepository;
 import com.dm4nk.track_library_vaadin.repositiry.TrackRepository;
+import com.dm4nk.track_library_vaadin.service.GenreService;
+import com.dm4nk.track_library_vaadin.service.TrackService;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
@@ -13,7 +15,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -21,12 +22,12 @@ import java.util.Arrays;
  */
 @Component
 public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
-    private final TrackRepository trackRepository;
-    private final GenreRepository genreRepository;
+    private final TrackService trackService;
+    private final GenreService genreService;
 
-    public DataLoader(TrackRepository trackRepository, GenreRepository genreRepository) {
-        this.trackRepository = trackRepository;
-        this.genreRepository = genreRepository;
+    public DataLoader(TrackService trackService, GenreService genreService) {
+        this.trackService = trackService;
+        this.genreService = genreService;
     }
 
     /**
@@ -43,9 +44,9 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
 
     private void loadData() throws IOException {
 
-        Genre rap = genreRepository.findByName("rap").orElse(null);
-        Genre russian = genreRepository.findByName("русская").orElse(null);
-        Genre pop = genreRepository.findByName("pop").orElse(null);
+        Genre rap = genreService.findByName("rap").orElse(null);
+        Genre russian = genreService.findByName("русская").orElse(null);
+        Genre pop = genreService.findByName("pop").orElse(null);
 
         String filePathMontero = "src/main/resources/static/tracks/MONTERO.wav";
         byte[] dataMontero = Files.readAllBytes(Paths.get(filePathMontero));
@@ -106,6 +107,8 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
         rap.getTracks().addAll(Arrays.asList(track1, track4, track5));
         russian.getTracks().add(track2);
 
-        genreRepository.saveAll(Arrays.asList(pop, rap, russian));
+        genreService.save(pop);
+        genreService.save(russian);
+        genreService.save(rap);
     }
 }

@@ -8,6 +8,7 @@ import com.dm4nk.track_library_vaadin.converters.WrappedByteArrayToByteArray;
 import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.domain.Track;
 import com.dm4nk.track_library_vaadin.repositiry.TrackRepository;
+import com.dm4nk.track_library_vaadin.service.TrackService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -34,7 +35,7 @@ import java.util.List;
 @Route("/tracks")
 @RouteAlias("")
 public class TrackActivity extends VerticalLayout {
-    private final TrackRepository trackRepository;
+    private final TrackService trackService;
 
     private final TrackEditor trackEditor;
     private final ShowTracksOfGenreComponent showTracksOfGenreComponent;
@@ -46,8 +47,8 @@ public class TrackActivity extends VerticalLayout {
     private final Notification notFoundNotification = new Notification();
     private ToolBar toolBar = null;
 
-    public TrackActivity(TrackRepository trackRepository, TrackEditor trackEditor, ShowTracksOfGenreComponent showTracksOfGenreComponent, ShowGenresComponent showGenresComponent) {
-        this.trackRepository = trackRepository;
+    public TrackActivity(TrackService trackService, TrackEditor trackEditor, ShowTracksOfGenreComponent showTracksOfGenreComponent, ShowGenresComponent showGenresComponent) {
+        this.trackService = trackService;
         this.trackEditor = trackEditor;
         this.showTracksOfGenreComponent = showTracksOfGenreComponent;
         this.showGenresComponent = showGenresComponent;
@@ -72,7 +73,7 @@ public class TrackActivity extends VerticalLayout {
     }
 
     private Grid<Track> createGrid() {
-        grid.setItems(trackRepository.findAll());
+        grid.setItems(trackService.findAll());
         grid.addColumn(Track::getName).setSortable(true).setHeader("Name");
         grid.addColumn(Track::getAuthor).setHeader("Author");
         grid.addColumn(Track::getAlbum).setHeader("Album");
@@ -138,23 +139,23 @@ public class TrackActivity extends VerticalLayout {
 
     private List<Track> findTracksByTemplate(String template) {
         if (template.isEmpty()) {
-            return trackRepository.findAll();
+            return trackService.findAll();
         } else {
             if (template.startsWith("id:")) {
                 String idstr = template.substring(3);
 
                 if (idstr.isEmpty())
-                    return trackRepository.findAll();
+                    return trackService.findAll();
 
                 Integer id = Integer.parseInt(idstr);
 
-                Track track = trackRepository.findById(id).orElse(null);
+                Track track = trackService.findById(id).orElse(null);
 
                 if (track == null) throw new NotFoundException("No track with such id");
 
                 return List.of(track);
             } else {
-                return trackRepository.findAllByNameAlbumAuthorLike(template);
+                return trackService.findAllByNameAlbumAuthorLike(template);
             }
         }
     }

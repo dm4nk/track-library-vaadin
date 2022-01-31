@@ -2,6 +2,7 @@ package com.dm4nk.track_library_vaadin.components;
 
 import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.repositiry.GenreRepository;
+import com.dm4nk.track_library_vaadin.service.GenreService;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyNotifier;
 import com.vaadin.flow.component.button.Button;
@@ -20,7 +21,7 @@ import lombok.Setter;
 @SpringComponent
 @UIScope
 public class GenreEditor extends FormLayout implements KeyNotifier {
-    private final GenreRepository genreRepository;
+    private final GenreService genreService;
 
     private final TextField name = new TextField("name");
 
@@ -36,15 +37,15 @@ public class GenreEditor extends FormLayout implements KeyNotifier {
     private ChangeHandler changeHandler;
     private Genre genre;
 
-    public GenreEditor(GenreRepository genreRepository) {
-        this.genreRepository = genreRepository;
+    public GenreEditor(GenreService genreService) {
+        this.genreService = genreService;
 
         add(name, actions);
 
         binder.forField(name)
                 .asRequired("Name is required")
                 .withValidator(
-                        prop -> genreRepository.findByName(prop).isEmpty(),
+                        prop -> genreService.findByName(prop).isEmpty(),
                         "Must be unique"
                 )
                 .bind(Genre::getName, Genre::setName);
@@ -74,7 +75,7 @@ public class GenreEditor extends FormLayout implements KeyNotifier {
         }
 
         if (newGenre.getId() != null) {
-            this.genre = genreRepository.findById(newGenre.getId()).orElse(newGenre);
+            this.genre = genreService.findById(newGenre.getId()).orElse(newGenre);
         } else {
             this.genre = newGenre;
         }
@@ -89,7 +90,7 @@ public class GenreEditor extends FormLayout implements KeyNotifier {
 
     private void delete() {
         try {
-            genreRepository.delete(genre);
+            genreService.delete(genre);
             changeHandler.onChange();
             dialog.close();
         } catch (Exception e) {
@@ -99,7 +100,7 @@ public class GenreEditor extends FormLayout implements KeyNotifier {
 
     private void save() {
         if (binder.validate().isOk()) {
-            genreRepository.save(genre);
+            genreService.save(genre);
             changeHandler.onChange();
             dialog.close();
         }

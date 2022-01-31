@@ -3,8 +3,8 @@ package com.dm4nk.track_library_vaadin.components;
 import com.dm4nk.track_library_vaadin.converters.ByteArrayToWrappedByteArray;
 import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.domain.Track;
-import com.dm4nk.track_library_vaadin.repositiry.GenreRepository;
-import com.dm4nk.track_library_vaadin.repositiry.TrackRepository;
+import com.dm4nk.track_library_vaadin.service.GenreService;
+import com.dm4nk.track_library_vaadin.service.TrackService;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyNotifier;
 import com.vaadin.flow.component.button.Button;
@@ -30,8 +30,8 @@ import java.time.LocalTime;
 @SpringComponent
 @UIScope
 public class TrackEditor extends FormLayout implements KeyNotifier {
-    private final TrackRepository trackRepository;
-    private final GenreRepository genreRepository;
+    private final TrackService trackService;
+    private final GenreService genreService;
     private final ComboBox<Genre> genre = new ComboBox<>("genre");
     private final TextField name = new TextField("name");
     private final TextField author = new TextField("author");
@@ -50,9 +50,9 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
     private ChangeHandler changeHandler;
     private Track track;
 
-    public TrackEditor(TrackRepository trackRepository, GenreRepository genreRepository) {
-        this.trackRepository = trackRepository;
-        this.genreRepository = genreRepository;
+    public TrackEditor(TrackService trackService, GenreService genreService) {
+        this.trackService = trackService;
+        this.genreService = genreService;
 
         add(name, author, album, duration, genre, upload, actions);
 
@@ -121,13 +121,13 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
         }
 
         if (newTrack.getId() != null) {
-            this.track = trackRepository.findById(newTrack.getId()).orElse(newTrack);
+            this.track = trackService.findById(newTrack.getId()).orElse(newTrack);
         } else {
             binder.removeBean();
             this.track = newTrack;
         }
 
-        genre.setItems(genreRepository.findAll());
+        genre.setItems(genreService.findAll());
         binder.setBean(track);
         dialog.open();
         dialog.add(this);
@@ -136,16 +136,16 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
     }
 
     private void delete() {
-        track.getGenre().getTracks().remove(track);
-        trackRepository.delete(track);
+        //track.getGenre().getTracks().remove(track);
+        trackService.delete(track);
         changeHandler.onChange();
         dialog.close();
     }
 
     private void save() {
         if (binder.validate().isOk()) {
-            trackRepository.save(track);
-            track.getGenre().getTracks().add(track);
+            //track.getGenre().getTracks().add(track);
+            trackService.save(track);
             changeHandler.onChange();
             dialog.close();
         }
