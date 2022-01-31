@@ -7,7 +7,6 @@ import com.dm4nk.track_library_vaadin.components.utility.ToolBar;
 import com.dm4nk.track_library_vaadin.converters.WrappedByteArrayToByteArray;
 import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.domain.Track;
-import com.dm4nk.track_library_vaadin.repositiry.TrackRepository;
 import com.dm4nk.track_library_vaadin.service.TrackService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -68,6 +67,7 @@ public class TrackActivity extends VerticalLayout {
         this.trackEditor.setChangeHandler(() -> showTracks(toolBar.getFilter().getValue()));
         this.showTracksOfGenreComponent.setClickHandler(trackId -> toolBar.getFilter().setValue("id:" + trackId));
         this.showGenresComponent.getGenreEditor().setChangeHandler(() -> showTracks(toolBar.getFilter().getValue()));
+        this.showGenresComponent.setClickHandler(genre -> showTracksOfGenreComponent.initComponent(genre.getTracks()));
 
         showTracks("");
     }

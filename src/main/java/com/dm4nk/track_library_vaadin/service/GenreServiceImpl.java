@@ -16,12 +16,12 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
-    public List<Genre> findAll(){
+    public List<Genre> findAll() {
         return genreRepository.findAll();
     }
 
     @Override
-    public Optional<Genre> findByName(String name){
+    public Optional<Genre> findByName(String name) {
         return genreRepository.findByName(name);
     }
 
@@ -31,7 +31,7 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
-    public List<Genre> findAllByNameLike(String template){
+    public List<Genre> findAllByNameLike(String template) {
         return genreRepository.findAllByNameLike(template);
     }
 

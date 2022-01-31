@@ -1,7 +1,6 @@
 package com.dm4nk.track_library_vaadin.components;
 
 import com.dm4nk.track_library_vaadin.domain.Genre;
-import com.dm4nk.track_library_vaadin.repositiry.GenreRepository;
 import com.dm4nk.track_library_vaadin.service.GenreService;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyNotifier;

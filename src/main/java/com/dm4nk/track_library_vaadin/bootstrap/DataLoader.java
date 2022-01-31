@@ -3,8 +3,6 @@ package com.dm4nk.track_library_vaadin.bootstrap;
 import com.dm4nk.track_library_vaadin.converters.ByteArrayToWrappedByteArray;
 import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.domain.Track;
-import com.dm4nk.track_library_vaadin.repositiry.GenreRepository;
-import com.dm4nk.track_library_vaadin.repositiry.TrackRepository;
 import com.dm4nk.track_library_vaadin.service.GenreService;
 import com.dm4nk.track_library_vaadin.service.TrackService;
 import org.springframework.context.ApplicationListener;

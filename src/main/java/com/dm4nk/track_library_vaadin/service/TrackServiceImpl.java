@@ -36,7 +36,7 @@ public class TrackServiceImpl implements TrackService {
     @Override
     public Track save(Track track) {
         Genre genre = track.getGenre();
-        if(genre.getId() == null){
+        if (genre.getId() == null) {
             throw new RuntimeException("Genre without id");
         }
         genre.getTracks().add(track);
@@ -50,7 +50,7 @@ public class TrackServiceImpl implements TrackService {
     @Override
     public void delete(Track track) {
         Genre genre = track.getGenre();
-        if(genre.getId() == null){
+        if (genre.getId() == null) {
             throw new RuntimeException("Genre without id");
         }
         genre.getTracks().remove(track);
