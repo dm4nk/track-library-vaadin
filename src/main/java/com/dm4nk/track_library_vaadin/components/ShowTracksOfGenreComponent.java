@@ -8,7 +8,6 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Set;
 
 @SpringComponent

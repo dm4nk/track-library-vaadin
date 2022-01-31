@@ -5,16 +5,10 @@ import com.dm4nk.track_library_vaadin.components.utility.ToolBar;
 import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.repositiry.GenreRepository;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.Lumo;
 
 @Route("/genres")
 public class GenreActivity extends VerticalLayout {
@@ -48,9 +42,7 @@ public class GenreActivity extends VerticalLayout {
                 .setSortable(true)
                 .setHeader("name");
 
-        grid.asSingleSelect().addValueChangeListener(event -> {
-            genreEditor.editGenre(event.getValue());
-        });
+        grid.asSingleSelect().addValueChangeListener(event -> genreEditor.editGenre(event.getValue()));
 
         return grid;
     }

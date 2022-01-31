@@ -2,12 +2,13 @@ package com.dm4nk.track_library_vaadin.domain;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Simple business object representing a Genre

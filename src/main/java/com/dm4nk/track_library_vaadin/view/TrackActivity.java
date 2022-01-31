@@ -64,7 +64,7 @@ public class TrackActivity extends VerticalLayout {
 
         trackEditor.setChangeHandler(() -> showTracks(toolBar.getFilter().getValue()));
 
-        showTracksOfGenreComponent.setClickHandler(trackId ->  toolBar.getFilter().setValue("id:" + trackId));
+        showTracksOfGenreComponent.setClickHandler(trackId -> toolBar.getFilter().setValue("id:" + trackId));
 
         showTracks("");
     }
@@ -125,32 +125,30 @@ public class TrackActivity extends VerticalLayout {
     }
 
     private void showTracks(String template) {
-        try{
+        try {
             grid.setItems(findTracksByTemplate(template));
-        }
-        catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             numberFormatNotification.open();
-        }
-        catch (NotFoundException e){
+        } catch (NotFoundException e) {
             notFoundNotification.open();
         }
     }
 
-    private List<Track> findTracksByTemplate(String template){
+    private List<Track> findTracksByTemplate(String template) {
         if (template.isEmpty()) {
             return trackRepository.findAll();
         } else {
-            if(template.startsWith("id:")){
+            if (template.startsWith("id:")) {
                 String idstr = template.substring(3);
 
-                if(idstr.isEmpty())
+                if (idstr.isEmpty())
                     return trackRepository.findAll();
 
                 Integer id = Integer.parseInt(idstr);
 
                 Track track = trackRepository.findById(id).orElse(null);
 
-                if(track == null) throw new NotFoundException("No track with such id");
+                if (track == null) throw new NotFoundException("No track with such id");
 
                 return List.of(track);
             } else {

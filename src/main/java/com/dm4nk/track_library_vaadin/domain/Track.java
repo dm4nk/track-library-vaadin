@@ -2,7 +2,6 @@ package com.dm4nk.track_library_vaadin.domain;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;

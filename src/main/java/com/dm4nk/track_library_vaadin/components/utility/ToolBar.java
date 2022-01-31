@@ -15,7 +15,7 @@ import com.vaadin.flow.theme.lumo.Lumo;
 import lombok.Getter;
 
 @UIScope
-public class ToolBar extends HorizontalLayout{
+public class ToolBar extends HorizontalLayout {
     private final Button backButton;
     @Getter
     private final TextField filter = new TextField("", "Type to filter");
