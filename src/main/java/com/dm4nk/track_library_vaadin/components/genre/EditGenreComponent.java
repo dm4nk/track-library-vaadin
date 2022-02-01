@@ -1,4 +1,4 @@
-package com.dm4nk.track_library_vaadin.components;
+package com.dm4nk.track_library_vaadin.components.genre;
 
 import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.service.GenreService;
@@ -13,22 +13,21 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import lombok.Setter;
 
 @SpringComponent
 @UIScope
-public class GenreEditor extends FormLayout implements KeyNotifier {
+public class EditGenreComponent extends FormLayout implements KeyNotifier {
     private final GenreService genreService;
 
     private final TextField name = new TextField("name");
-
     private final Button save = new Button("Save", VaadinIcon.CHECK.create());
     private final Button cancel = new Button("Cancel");
     private final Button delete = new Button("Delete", VaadinIcon.TRASH.create());
     private final HorizontalLayout actions = new HorizontalLayout(save, cancel, delete);
-
     private final BeanValidationBinder<Genre> binder = new BeanValidationBinder<>(Genre.class);
     private final Dialog dialog = new Dialog();
     private final Notification notification = new Notification();
@@ -36,7 +35,7 @@ public class GenreEditor extends FormLayout implements KeyNotifier {
     private ChangeHandler changeHandler;
     private Genre genre;
 
-    public GenreEditor(GenreService genreService) {
+    public EditGenreComponent(GenreService genreService) {
         this.genreService = genreService;
 
         add(name, actions);
@@ -47,6 +46,7 @@ public class GenreEditor extends FormLayout implements KeyNotifier {
                         prop -> genreService.findByName(prop).isEmpty(),
                         "Must be unique"
                 )
+                .withValidator(new StringLengthValidator("Must me less 255 symbols", 1, 255))
                 .bind(Genre::getName, Genre::setName);
 
         save.getElement().getThemeList().add("primary");

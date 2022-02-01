@@ -1,11 +1,11 @@
 package com.dm4nk.track_library_vaadin.view;
 
-import com.dm4nk.track_library_vaadin.components.ShowGenresComponent;
-import com.dm4nk.track_library_vaadin.components.ShowTracksOfGenreComponent;
-import com.dm4nk.track_library_vaadin.components.TrackEditor;
-import com.dm4nk.track_library_vaadin.components.utility.ToolBar;
+import com.dm4nk.track_library_vaadin.components.author.ShowAuthorsComponent;
+import com.dm4nk.track_library_vaadin.components.author.ShowTracksOfAuthorComponent;
+import com.dm4nk.track_library_vaadin.components.genre.ShowGenresComponent;
+import com.dm4nk.track_library_vaadin.components.genre.ShowTracksOfGenreComponent;
+import com.dm4nk.track_library_vaadin.components.track.EditTrackComponent;
 import com.dm4nk.track_library_vaadin.converters.WrappedByteArrayToByteArray;
-import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.domain.Track;
 import com.dm4nk.track_library_vaadin.service.TrackService;
 import com.vaadin.flow.component.UI;
@@ -16,14 +16,20 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.NotFoundException;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.StreamRegistration;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.theme.lumo.Lumo;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
@@ -34,48 +40,75 @@ import java.util.List;
 @Route("/tracks")
 @RouteAlias("")
 public class TrackActivity extends VerticalLayout {
+    //service
     private final TrackService trackService;
 
-    private final TrackEditor trackEditor;
+    //components
+    private final EditTrackComponent editTrackComponent;
     private final ShowTracksOfGenreComponent showTracksOfGenreComponent;
     private final ShowGenresComponent showGenresComponent;
+    private final ShowTracksOfAuthorComponent showTracksOfAuthorComponent;
+    private final ShowAuthorsComponent showAuthorsComponent;
 
+    //grid
     private final Grid<Track> grid = new Grid<>();
+
+    //notification
     private final Notification downloadNotification = new Notification();
     private final Notification numberFormatNotification = new Notification();
     private final Notification notFoundNotification = new Notification();
-    private ToolBar toolBar = null;
 
-    public TrackActivity(TrackService trackService, TrackEditor trackEditor, ShowTracksOfGenreComponent showTracksOfGenreComponent, ShowGenresComponent showGenresComponent) {
+    //toolbar
+    private final HorizontalLayout toolBar = new HorizontalLayout();
+    private final Button genresButton = new Button("Genres", VaadinIcon.HEART.create());
+    private final Button authorsButton = new Button("Authors", VaadinIcon.GROUP.create());
+    private final TextField filter = new TextField("", "Type to filter");
+    private final Button addNewButton = new Button("Add", VaadinIcon.ADD_DOCK.create());
+    private final Button toggleButton = new Button(VaadinIcon.MOON.create());
+    private final Button refreshButton = new Button(VaadinIcon.REFRESH.create());
+
+    public TrackActivity(TrackService trackService, EditTrackComponent editTrackComponent, ShowTracksOfGenreComponent showTracksOfGenreComponent, ShowGenresComponent showGenresComponent, ShowTracksOfAuthorComponent showTracksOfAuthorComponent, ShowAuthorsComponent showAuthorsComponent) {
         this.trackService = trackService;
-        this.trackEditor = trackEditor;
+        this.editTrackComponent = editTrackComponent;
         this.showTracksOfGenreComponent = showTracksOfGenreComponent;
         this.showGenresComponent = showGenresComponent;
+        this.showTracksOfAuthorComponent = showTracksOfAuthorComponent;
+        this.showAuthorsComponent = showAuthorsComponent;
 
         configureNotification();
-
-        toolBar = new ToolBar(
-                "Genres",
-                VaadinIcon.HEART,
-                event -> showTracks((String) event.getValue()),
-                event -> trackEditor.editTrack(Track.builder().build()),
-                event -> showGenresComponent.initComponent(),
-                click -> showTracks(toolBar.getFilter().getValue()));
-
-        add(toolBar, createGrid());
-
-        this.trackEditor.setChangeHandler(() -> showTracks(toolBar.getFilter().getValue()));
-        this.showTracksOfGenreComponent.setClickHandler(trackId -> toolBar.getFilter().setValue("id:" + trackId));
-        this.showGenresComponent.getGenreEditor().setChangeHandler(() -> showTracks(toolBar.getFilter().getValue()));
-        this.showGenresComponent.setClickHandler(genre -> showTracksOfGenreComponent.initComponent(genre.getTracks()));
-
+        configureComponents();
+        add(createToolBar(), createGrid());
         showTracks("");
+    }
+
+    private void configureComponents() {
+        this.editTrackComponent.setChangeHandler(() -> showTracks(filter.getValue()));
+
+        this.showTracksOfGenreComponent.setClickHandler(trackId -> filter.setValue("id:" + trackId));
+        this.showGenresComponent.getEditGenreComponent().setChangeHandler(() -> {
+            showTracks(filter.getValue());
+            showGenresComponent.initComponent();
+        });
+        this.showGenresComponent.setClickHandler(showTracksOfGenreComponent::initComponent);
+
+        this.showTracksOfAuthorComponent.setClickHandler(trackId -> filter.setValue("id:" + trackId));
+        this.showAuthorsComponent.getEditAuthorComponent().setChangeHandler(() -> {
+            showTracks(filter.getValue());
+            showAuthorsComponent.initComponent();
+        });
+        this.showAuthorsComponent.setClickHandler(showTracksOfAuthorComponent::initComponent);
     }
 
     private Grid<Track> createGrid() {
         grid.setItems(trackService.findAll());
         grid.addColumn(Track::getName).setSortable(true).setHeader("Name");
-        grid.addColumn(Track::getAuthor).setHeader("Author");
+        grid.addColumn(
+                        new ComponentRenderer<>(Button::new, (button, track) -> {
+                            button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+                            button.addClickListener(e -> showTracksOfAuthorComponent.initComponent(track.getAuthor()));
+                            button.setText(track.getAuthor().getName());
+                        }))
+                .setHeader("Author");
         grid.addColumn(Track::getAlbum).setHeader("Album");
         grid.addColumn(Track::getDuration)
                 .setSortable(true)
@@ -83,7 +116,7 @@ public class TrackActivity extends VerticalLayout {
         grid.addColumn(
                         new ComponentRenderer<>(Button::new, (button, track) -> {
                             button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-                            button.addClickListener(e -> this.showTracksOfGenre(track.getGenre()));
+                            button.addClickListener(e -> showTracksOfGenreComponent.initComponent(track.getGenre()));
                             button.setText(track.getGenre().getName());
                         }))
                 .setHeader("Genre");
@@ -96,7 +129,7 @@ public class TrackActivity extends VerticalLayout {
                         }))
                 .setHeader("Download");
 
-        grid.asSingleSelect().addValueChangeListener(event -> trackEditor.editTrack(event.getValue()));
+        grid.asSingleSelect().addValueChangeListener(event -> editTrackComponent.editTrack(event.getValue()));
 
         return grid;
     }
@@ -115,6 +148,35 @@ public class TrackActivity extends VerticalLayout {
         notFoundNotification.setPosition(Notification.Position.BOTTOM_CENTER);
         notFoundNotification.setText("No Track with such id");
         notFoundNotification.setDuration(1200);
+    }
+
+    private HorizontalLayout createToolBar() {
+        filter.setValueChangeMode(ValueChangeMode.EAGER);
+        filter.addValueChangeListener(event -> showTracks(event.getValue()));
+        addNewButton.addClickListener(event -> editTrackComponent.editTrack(Track.builder().build()));
+        genresButton.addClickListener(event -> showGenresComponent.initComponent());
+        authorsButton.addClickListener(event -> showAuthorsComponent.initComponent());
+        refreshButton.addClickListener(click -> showTracks(filter.getValue()));
+
+        toggleButton.addClickListener(click -> {
+            ThemeList themeList = UI.getCurrent().getElement().getThemeList();
+
+            if (themeList.contains(Lumo.DARK)) {
+                themeList.remove(Lumo.DARK);
+            } else {
+                themeList.add(Lumo.DARK);
+            }
+        });
+
+        toolBar.add(genresButton, authorsButton, addNewButton);
+        toolBar.addAndExpand(filter);
+        toolBar.add(refreshButton, toggleButton);
+        toolBar.setAlignSelf(FlexComponent.Alignment.STRETCH, filter);
+        toolBar.setAlignSelf(FlexComponent.Alignment.START, genresButton);
+        toolBar.setAlignSelf(FlexComponent.Alignment.START, addNewButton);
+        toolBar.setAlignSelf(FlexComponent.Alignment.END, toggleButton);
+
+        return toolBar;
     }
 
     private void download(Track track) {
@@ -158,11 +220,5 @@ public class TrackActivity extends VerticalLayout {
                 return trackService.findAllByNameAlbumAuthorLike(template);
             }
         }
-    }
-
-    private void showTracksOfGenre(Genre genre) {
-        showTracksOfGenreComponent.initComponent(
-                genre.getTracks()
-        );
     }
 }

@@ -1,5 +1,6 @@
 package com.dm4nk.track_library_vaadin.service;
 
+import com.dm4nk.track_library_vaadin.domain.Author;
 import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.domain.Track;
 import com.dm4nk.track_library_vaadin.repositiry.TrackRepository;
@@ -12,10 +13,12 @@ import java.util.Optional;
 public class TrackServiceImpl implements TrackService {
     private final TrackRepository trackRepository;
     private final GenreService genreService;
+    private final AuthorService authorService;
 
-    public TrackServiceImpl(TrackRepository trackRepository, GenreService genreService) {
+    public TrackServiceImpl(TrackRepository trackRepository, GenreService genreService, AuthorService authorService) {
         this.trackRepository = trackRepository;
         this.genreService = genreService;
+        this.authorService = authorService;
     }
 
     @Override
@@ -41,8 +44,13 @@ public class TrackServiceImpl implements TrackService {
         }
         genre.getTracks().add(track);
 
+        Author author = track.getAuthor();
+        if (author.getId() == null) {
+            throw new RuntimeException("Author without id");
+        }
+        author.getTracks().add(track);
+
         Track savedTrack = trackRepository.save(track);
-        genreService.save(genre);
 
         return savedTrack;
     }
@@ -54,7 +62,13 @@ public class TrackServiceImpl implements TrackService {
             throw new RuntimeException("Genre without id");
         }
         genre.getTracks().remove(track);
-        genreService.save(genre);
+
+        Author author = track.getAuthor();
+        if (author.getId() == null) {
+            throw new RuntimeException("Author without id");
+        }
+        author.getTracks().remove(track);
+
         trackRepository.delete(track);
     }
 }

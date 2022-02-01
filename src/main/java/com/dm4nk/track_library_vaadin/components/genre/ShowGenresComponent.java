@@ -1,4 +1,4 @@
-package com.dm4nk.track_library_vaadin.components;
+package com.dm4nk.track_library_vaadin.components.genre;
 
 import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.service.GenreService;
@@ -23,7 +23,7 @@ public class ShowGenresComponent extends VerticalLayout {
     private final Dialog dialog = new Dialog();
     private final GenreService genreService;
     @Getter
-    private final GenreEditor genreEditor;
+    private final EditGenreComponent editGenreComponent;
     private final Button addNewButton = new Button("Add", VaadinIcon.ADD_DOCK.create());
     private final TextField filter = new TextField("", "Type to filter");
     private final HorizontalLayout toolbar = new HorizontalLayout();
@@ -31,9 +31,9 @@ public class ShowGenresComponent extends VerticalLayout {
     @Setter
     private ClickHandler clickHandler;
 
-    public ShowGenresComponent(GenreService genreService, GenreEditor genreEditor) {
+    public ShowGenresComponent(GenreService genreService, EditGenreComponent editGenreComponent) {
         this.genreService = genreService;
-        this.genreEditor = genreEditor;
+        this.editGenreComponent = editGenreComponent;
         setWidth("600px");
         setHeight("400px");
 
@@ -44,7 +44,7 @@ public class ShowGenresComponent extends VerticalLayout {
         filter.addValueChangeListener(event -> showGenres(event.getValue()));
         addNewButton.addClickListener(event -> {
             dialog.close();
-            genreEditor.editGenre(Genre.builder().build());
+            editGenreComponent.editGenre(Genre.builder().build());
         });
     }
 
@@ -62,7 +62,7 @@ public class ShowGenresComponent extends VerticalLayout {
 
         grid.addItemClickListener(event -> {
             dialog.close();
-            genreEditor.editGenre(event.getItem());
+            editGenreComponent.editGenre(event.getItem());
         });
     }
 
@@ -77,8 +77,6 @@ public class ShowGenresComponent extends VerticalLayout {
         initGrid();
 
         showGenres(filter.getValue());
-
-        genreEditor.setChangeHandler(this::initComponent);
 
         dialog.open();
         dialog.add(this);

@@ -1,8 +1,10 @@
-package com.dm4nk.track_library_vaadin.components;
+package com.dm4nk.track_library_vaadin.components.track;
 
 import com.dm4nk.track_library_vaadin.converters.ByteArrayToWrappedByteArray;
+import com.dm4nk.track_library_vaadin.domain.Author;
 import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.domain.Track;
+import com.dm4nk.track_library_vaadin.service.AuthorService;
 import com.dm4nk.track_library_vaadin.service.GenreService;
 import com.dm4nk.track_library_vaadin.service.TrackService;
 import com.vaadin.flow.component.Key;
@@ -18,6 +20,7 @@ import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import lombok.Setter;
@@ -29,12 +32,13 @@ import java.time.LocalTime;
 
 @SpringComponent
 @UIScope
-public class TrackEditor extends FormLayout implements KeyNotifier {
+public class EditTrackComponent extends FormLayout implements KeyNotifier {
     private final TrackService trackService;
     private final GenreService genreService;
+    private final AuthorService authorService;
     private final ComboBox<Genre> genre = new ComboBox<>("genre");
     private final TextField name = new TextField("name");
-    private final TextField author = new TextField("author");
+    private final ComboBox<Author> author = new ComboBox<>("author");
     private final TextField album = new TextField("album");
     private final TimePicker duration = new TimePicker();
     private final Button save = new Button("Save", VaadinIcon.CHECK.create());
@@ -50,9 +54,10 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
     private ChangeHandler changeHandler;
     private Track track;
 
-    public TrackEditor(TrackService trackService, GenreService genreService) {
+    public EditTrackComponent(TrackService trackService, GenreService genreService, AuthorService authorService) {
         this.trackService = trackService;
         this.genreService = genreService;
+        this.authorService = authorService;
 
         add(name, author, album, duration, genre, upload, actions);
 
@@ -91,6 +96,7 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
     private void initBinders() {
         binder.forField(name)
                 .asRequired("Name is required")
+                .withValidator(new StringLengthValidator("Must me less 255 symbols", 1, 255))
                 .bind(Track::getName, Track::setName);
 
         binder.forField(author)
@@ -99,6 +105,7 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
 
         binder.forField(album)
                 .asRequired("Album is required")
+                .withValidator(new StringLengthValidator("Must me less 255 symbols", 1, 255))
                 .bind(Track::getAlbum, Track::setAlbum);
 
         binder.forField(duration)
@@ -128,6 +135,7 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
         }
 
         genre.setItems(genreService.findAll());
+        author.setItems(authorService.findAll());
         binder.setBean(track);
         dialog.open();
         dialog.add(this);
@@ -136,7 +144,6 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
     }
 
     private void delete() {
-        //track.getGenre().getTracks().remove(track);
         trackService.delete(track);
         changeHandler.onChange();
         dialog.close();
@@ -144,7 +151,6 @@ public class TrackEditor extends FormLayout implements KeyNotifier {
 
     private void save() {
         if (binder.validate().isOk()) {
-            //track.getGenre().getTracks().add(track);
             trackService.save(track);
             changeHandler.onChange();
             dialog.close();

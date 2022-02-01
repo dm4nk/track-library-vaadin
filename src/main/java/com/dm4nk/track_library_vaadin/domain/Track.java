@@ -2,6 +2,7 @@ package com.dm4nk.track_library_vaadin.domain;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -25,10 +26,13 @@ public class Track implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
     @NotBlank
+    @Length(message = "Must me less 255 symbols", min = 1, max = 255)
     String name;
+    @ManyToOne
+    @NotNull
+    Author author;
     @NotBlank
-    String author;
-    @NotBlank
+    @Length(message = "Must me less 255 symbols", min = 1, max = 255)
     String album;
     @NotNull
     LocalTime duration;
@@ -39,7 +43,7 @@ public class Track implements Serializable {
     Byte[] track;
 
     @Builder
-    public Track(Integer id, String name, String author, String album, LocalTime duration, Genre genre, Byte[] track) {
+    public Track(Integer id, String name, Author author, String album, LocalTime duration, Genre genre, Byte[] track) {
         this.id = id;
         this.name = name;
         this.author = author;
