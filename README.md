@@ -10,7 +10,7 @@ with [Vaadin](https://vaadin.com/)
 for building UI.
 
 It was built for educational purpose helping with understanding basic principles and syntax of Spring, JPA, Vaadin, MVC
-pattern, Validation and Caching.
+pattern and Validation.
 
 Provides basic CRUD operations with
 [Tracks](https://github.com/dm4nk/track_library_vaadin/blob/master/src/main/java/com/dm4nk/track_library_vaadin/domain/Track.java)
@@ -19,7 +19,11 @@ and
 
 ### Tracks
 
-![Tracks](https://user-images.githubusercontent.com/80630476/150698632-1365b47e-ece9-4f6b-844b-2170fdb41556.png)
+![Tracks](https://user-images.githubusercontent.com/80630476/151863905-6ae8702b-d3f6-424a-bca2-ebdb1ec8a8ed.png)
+
+### Genres
+
+![Genres](https://user-images.githubusercontent.com/80630476/151864046-1e108bd9-a631-48c5-815c-fd7af9246bfa.png)
 
 ### Add New Track
 
@@ -28,4 +32,9 @@ and
 ### Delete Genre in use
 
 ![Genres](https://user-images.githubusercontent.com/80630476/150698651-3b58715a-fd82-420d-b5a9-a3a856abdc64.png)
+
+### Show all tracks of certain genre
+
+![Genres](https://user-images.githubusercontent.com/80630476/151864231-d192be80-627d-4bb0-afae-d248dc55c730.png)
+
 
