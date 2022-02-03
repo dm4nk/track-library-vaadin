@@ -1,9 +1,11 @@
 package com.dm4nk.track_library_vaadin.components.track;
 
 import com.dm4nk.track_library_vaadin.converters.ByteArrayToWrappedByteArray;
+import com.dm4nk.track_library_vaadin.domain.Album;
 import com.dm4nk.track_library_vaadin.domain.Author;
 import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.domain.Track;
+import com.dm4nk.track_library_vaadin.service.AlbumService;
 import com.dm4nk.track_library_vaadin.service.AuthorService;
 import com.dm4nk.track_library_vaadin.service.GenreService;
 import com.dm4nk.track_library_vaadin.service.TrackService;
@@ -36,10 +38,11 @@ public class EditTrackComponent extends FormLayout implements KeyNotifier {
     private final TrackService trackService;
     private final GenreService genreService;
     private final AuthorService authorService;
+    private final AlbumService albumService;
     private final ComboBox<Genre> genre = new ComboBox<>("genre");
     private final TextField name = new TextField("name");
     private final ComboBox<Author> author = new ComboBox<>("author");
-    private final TextField album = new TextField("album");
+    private final ComboBox<Album> album = new ComboBox<>("album");
     private final TimePicker duration = new TimePicker();
     private final Button save = new Button("Save", VaadinIcon.CHECK.create());
     private final Button cancel = new Button("Cancel");
@@ -54,10 +57,11 @@ public class EditTrackComponent extends FormLayout implements KeyNotifier {
     private ChangeHandler changeHandler;
     private Track track;
 
-    public EditTrackComponent(TrackService trackService, GenreService genreService, AuthorService authorService) {
+    public EditTrackComponent(TrackService trackService, GenreService genreService, AuthorService authorService, AlbumService albumService) {
         this.trackService = trackService;
         this.genreService = genreService;
         this.authorService = authorService;
+        this.albumService = albumService;
 
         add(name, author, album, duration, genre, upload, actions);
 
@@ -105,7 +109,6 @@ public class EditTrackComponent extends FormLayout implements KeyNotifier {
 
         binder.forField(album)
                 .asRequired("Album is required")
-                .withValidator(new StringLengthValidator("Must me less 255 symbols", 1, 255))
                 .bind(Track::getAlbum, Track::setAlbum);
 
         binder.forField(duration)
@@ -136,6 +139,7 @@ public class EditTrackComponent extends FormLayout implements KeyNotifier {
 
         genre.setItems(genreService.findAll());
         author.setItems(authorService.findAll());
+        album.setItems(albumService.findAll());
         binder.setBean(track);
         dialog.open();
         dialog.add(this);

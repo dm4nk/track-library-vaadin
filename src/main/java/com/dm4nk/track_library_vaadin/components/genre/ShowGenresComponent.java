@@ -1,5 +1,6 @@
 package com.dm4nk.track_library_vaadin.components.genre;
 
+import com.dm4nk.track_library_vaadin.components.utility.WidthHeightSetter;
 import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.service.GenreService;
 import com.vaadin.flow.component.button.Button;
@@ -25,7 +26,7 @@ public class ShowGenresComponent extends VerticalLayout {
     @Getter
     private final EditGenreComponent editGenreComponent;
     private final Button addNewButton = new Button("Add", VaadinIcon.ADD_DOCK.create());
-    private final TextField filter = new TextField("", "Type to filter");
+    private final TextField filter = new TextField("", "Search in Genres");
     private final HorizontalLayout toolbar = new HorizontalLayout();
     private Grid<Genre> grid;
     @Setter
@@ -34,8 +35,8 @@ public class ShowGenresComponent extends VerticalLayout {
     public ShowGenresComponent(GenreService genreService, EditGenreComponent editGenreComponent) {
         this.genreService = genreService;
         this.editGenreComponent = editGenreComponent;
-        setWidth("600px");
-        setHeight("400px");
+
+        WidthHeightSetter.setWidthHeight(this);
 
         toolbar.add(addNewButton);
         toolbar.addAndExpand(filter);
@@ -70,16 +71,24 @@ public class ShowGenresComponent extends VerticalLayout {
         grid.setItems(genreService.findAllByNameLike(template));
     }
 
-    public void initComponent() {
+    //todo: needed?
+    public void initComponent(Genre... genre) {
         grid = new Grid<>();
         removeAll();
         add(toolbar, grid);
         initGrid();
 
-        showGenres(filter.getValue());
+        if (genre == null)
+            showGenres(filter.getValue());
+        else
+            grid.setItems(genre);
 
         dialog.open();
         dialog.add(this);
+    }
+
+    public void initComponent() {
+        initComponent(null);
     }
 
     public interface ClickHandler {

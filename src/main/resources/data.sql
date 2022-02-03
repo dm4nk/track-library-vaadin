@@ -1,21 +1,21 @@
-INSERT INTO genre (name)
+INSERT INTO genres (name)
 VALUES ('rap');
-INSERT INTO genre (name)
+INSERT INTO genres (name)
 VALUES ('pop');
-INSERT INTO genre (name)
+INSERT INTO genres (name)
 VALUES ('rock');
-INSERT INTO genre (name)
+INSERT INTO genres (name)
 VALUES ('jazz');
-INSERT INTO genre (name)
+INSERT INTO genres (name)
 VALUES ('русская');
 
-INSERT INTO author (name)
+INSERT INTO authors (name)
 VALUES ('Lil Nas X');
-INSERT INTO author (name)
+INSERT INTO authors (name)
 VALUES ('Лизер');
-INSERT INTO author (name)
+INSERT INTO authors (name)
 VALUES ('The Score');
-INSERT INTO author (name)
+INSERT INTO authors (name)
 VALUES ('Lil Peep');
-INSERT INTO author (name)
+INSERT INTO authors (name)
 VALUES ('XXXXTENTACION');

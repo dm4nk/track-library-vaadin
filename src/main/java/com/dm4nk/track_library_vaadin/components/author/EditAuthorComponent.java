@@ -39,6 +39,10 @@ public class EditAuthorComponent extends FormLayout implements KeyNotifier {
         add(name, actions);
 
         binder.forField(name)
+                .withValidator(
+                        prop -> authorService.findByName(prop).isEmpty(),
+                        "Must be unique"
+                )
                 .withValidator(new StringLengthValidator("Must me less 255 symbols", 1, 255))
                 .asRequired("Name is required")
                 .bind(Author::getName, Author::setName);

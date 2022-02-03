@@ -2,10 +2,11 @@ package com.dm4nk.track_library_vaadin.domain;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
+import javax.persistence.Entity;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalTime;
@@ -15,37 +16,35 @@ import java.util.Objects;
  * Simple business object representing a Track
  */
 @Entity
+@Table(name = "tracks")
 
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Track implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
-    @NotBlank
-    @Length(message = "Must me less 255 symbols", min = 1, max = 255)
-    String name;
+public class Track extends NamedEntity implements Serializable {
     @ManyToOne
     @NotNull
     Author author;
-    @NotBlank
-    @Length(message = "Must me less 255 symbols", min = 1, max = 255)
-    String album;
+
+    @ManyToOne
+    @NotNull
+    Album album;
+
     @NotNull
     LocalTime duration;
+
     @ManyToOne
     @NotNull
     Genre genre;
+
     @Lob
     Byte[] track;
 
     @Builder
-    public Track(Integer id, String name, Author author, String album, LocalTime duration, Genre genre, Byte[] track) {
-        this.id = id;
-        this.name = name;
+    public Track(Integer id, String name, Author author, Album album, LocalTime duration, Genre genre, Byte[] track) {
+        super(id, name);
         this.author = author;
         this.album = album;
         this.duration = duration;
@@ -58,8 +57,8 @@ public class Track implements Serializable {
         if (this == o) return true;
         if (!(o instanceof Track track)) return false;
 
-        if (!Objects.equals(id, track.id)) return false;
-        if (!Objects.equals(name, track.name)) return false;
+        if (!Objects.equals(getId(), track.getId())) return false;
+        if (!Objects.equals(getName(), track.getName())) return false;
         if (!Objects.equals(author, track.author)) return false;
         if (!Objects.equals(album, track.album)) return false;
         if (!Objects.equals(duration, track.duration)) return false;
@@ -68,8 +67,8 @@ public class Track implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
+        int result = getId() != null ? getId().hashCode() : 0;
+        result = 31 * result + (getName() != null ? getName().hashCode() : 0);
         result = 31 * result + (author != null ? author.hashCode() : 0);
         result = 31 * result + (album != null ? album.hashCode() : 0);
         result = 31 * result + (duration != null ? duration.hashCode() : 0);

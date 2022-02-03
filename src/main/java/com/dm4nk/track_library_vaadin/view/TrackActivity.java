@@ -1,11 +1,14 @@
 package com.dm4nk.track_library_vaadin.view;
 
+import com.dm4nk.track_library_vaadin.components.album.ShowAlbumsComponent;
 import com.dm4nk.track_library_vaadin.components.author.ShowAuthorsComponent;
-import com.dm4nk.track_library_vaadin.components.author.ShowTracksOfAuthorComponent;
 import com.dm4nk.track_library_vaadin.components.genre.ShowGenresComponent;
-import com.dm4nk.track_library_vaadin.components.genre.ShowTracksOfGenreComponent;
 import com.dm4nk.track_library_vaadin.components.track.EditTrackComponent;
+import com.dm4nk.track_library_vaadin.components.utility.ShowTracksOfNamedEntityComponent;
 import com.dm4nk.track_library_vaadin.converters.WrappedByteArrayToByteArray;
+import com.dm4nk.track_library_vaadin.domain.Album;
+import com.dm4nk.track_library_vaadin.domain.Author;
+import com.dm4nk.track_library_vaadin.domain.Genre;
 import com.dm4nk.track_library_vaadin.domain.Track;
 import com.dm4nk.track_library_vaadin.service.TrackService;
 import com.vaadin.flow.component.UI;
@@ -45,10 +48,12 @@ public class TrackActivity extends VerticalLayout {
 
     //components
     private final EditTrackComponent editTrackComponent;
-    private final ShowTracksOfGenreComponent showTracksOfGenreComponent;
+    private final ShowTracksOfNamedEntityComponent<Genre> showTracksOfGenreComponent;
     private final ShowGenresComponent showGenresComponent;
-    private final ShowTracksOfAuthorComponent showTracksOfAuthorComponent;
+    private final ShowTracksOfNamedEntityComponent<Author> showTracksOfAuthorComponent;
     private final ShowAuthorsComponent showAuthorsComponent;
+    private final ShowTracksOfNamedEntityComponent<Album> showTracksOfAlbumComponent;
+    private final ShowAlbumsComponent showAlbumsComponent;
 
     //grid
     private final Grid<Track> grid = new Grid<>();
@@ -62,23 +67,27 @@ public class TrackActivity extends VerticalLayout {
     private final HorizontalLayout toolBar = new HorizontalLayout();
     private final Button genresButton = new Button("Genres", VaadinIcon.HEART.create());
     private final Button authorsButton = new Button("Authors", VaadinIcon.GROUP.create());
+    private final Button albumsButton = new Button("Albums", VaadinIcon.FOLDER_O.create());
     private final TextField filter = new TextField("", "Type to filter");
     private final Button addNewButton = new Button("Add", VaadinIcon.ADD_DOCK.create());
     private final Button toggleButton = new Button(VaadinIcon.MOON.create());
     private final Button refreshButton = new Button(VaadinIcon.REFRESH.create());
 
-    public TrackActivity(TrackService trackService, EditTrackComponent editTrackComponent, ShowTracksOfGenreComponent showTracksOfGenreComponent, ShowGenresComponent showGenresComponent, ShowTracksOfAuthorComponent showTracksOfAuthorComponent, ShowAuthorsComponent showAuthorsComponent) {
+    public TrackActivity(TrackService trackService, EditTrackComponent editTrackComponent, ShowTracksOfNamedEntityComponent<Genre> showTracksOfGenreComponent, ShowGenresComponent showGenresComponent, ShowTracksOfNamedEntityComponent<Author> showTracksOfAuthorComponent, ShowAuthorsComponent showAuthorsComponent, ShowTracksOfNamedEntityComponent<Album> showTracksOfAlbumComponent, ShowAlbumsComponent showAlbumsComponent) {
         this.trackService = trackService;
         this.editTrackComponent = editTrackComponent;
         this.showTracksOfGenreComponent = showTracksOfGenreComponent;
         this.showGenresComponent = showGenresComponent;
         this.showTracksOfAuthorComponent = showTracksOfAuthorComponent;
         this.showAuthorsComponent = showAuthorsComponent;
+        this.showTracksOfAlbumComponent = showTracksOfAlbumComponent;
+        this.showAlbumsComponent = showAlbumsComponent;
 
         configureNotification();
         configureComponents();
         add(createToolBar(), createGrid());
         showTracks("");
+        setSizeFull();
     }
 
     private void configureComponents() {
@@ -89,14 +98,23 @@ public class TrackActivity extends VerticalLayout {
             showTracks(filter.getValue());
             showGenresComponent.initComponent();
         });
-        this.showGenresComponent.setClickHandler(showTracksOfGenreComponent::initComponent);
+        this.showGenresComponent.setClickHandler(genre -> showTracksOfGenreComponent.initComponent(genre, genre.getTracks()));
 
         this.showTracksOfAuthorComponent.setClickHandler(trackId -> filter.setValue("id:" + trackId));
         this.showAuthorsComponent.getEditAuthorComponent().setChangeHandler(() -> {
             showTracks(filter.getValue());
             showAuthorsComponent.initComponent();
         });
-        this.showAuthorsComponent.setClickHandler(showTracksOfAuthorComponent::initComponent);
+        this.showAuthorsComponent.setClickOnNameHandler(author -> showTracksOfAuthorComponent.initComponent(author, author.getTracks()));
+        this.showAuthorsComponent.setClickOnAlbumsHandler(author -> showAlbumsComponent.initComponent(author.getAlbums().toArray(new Album[0])));
+
+        this.showTracksOfAlbumComponent.setClickHandler(trackId -> filter.setValue("id:" + trackId));
+        this.showAlbumsComponent.getEditAlbumComponent().setChangeHandler(() -> {
+            showTracks(filter.getValue());
+            showAlbumsComponent.initComponent();
+        });
+        this.showAlbumsComponent.setClickOnNameHandler(album -> showTracksOfAlbumComponent.initComponent(album, album.getTracks()));
+        this.showAlbumsComponent.setClickOnAuthorHandler(album -> showAuthorsComponent.initComponent(album.getAuthor()));
     }
 
     private Grid<Track> createGrid() {
@@ -105,18 +123,24 @@ public class TrackActivity extends VerticalLayout {
         grid.addColumn(
                         new ComponentRenderer<>(Button::new, (button, track) -> {
                             button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-                            button.addClickListener(e -> showTracksOfAuthorComponent.initComponent(track.getAuthor()));
+                            button.addClickListener(e -> showTracksOfAuthorComponent.initComponent(track.getAuthor(), track.getAuthor().getTracks()));
                             button.setText(track.getAuthor().getName());
                         }))
                 .setHeader("Author");
-        grid.addColumn(Track::getAlbum).setHeader("Album");
+        grid.addColumn(
+                        new ComponentRenderer<>(Button::new, (button, track) -> {
+                            button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+                            button.addClickListener(e -> showTracksOfAlbumComponent.initComponent(track.getAlbum(), track.getAlbum().getTracks()));
+                            button.setText(track.getAlbum().getName());
+                        }))
+                .setHeader("Album");
         grid.addColumn(Track::getDuration)
                 .setSortable(true)
                 .setHeader("Duration");
         grid.addColumn(
                         new ComponentRenderer<>(Button::new, (button, track) -> {
                             button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-                            button.addClickListener(e -> showTracksOfGenreComponent.initComponent(track.getGenre()));
+                            button.addClickListener(e -> showTracksOfGenreComponent.initComponent(track.getGenre(), track.getGenre().getTracks()));
                             button.setText(track.getGenre().getName());
                         }))
                 .setHeader("Genre");
@@ -130,7 +154,6 @@ public class TrackActivity extends VerticalLayout {
                 .setHeader("Download");
 
         grid.asSingleSelect().addValueChangeListener(event -> editTrackComponent.editTrack(event.getValue()));
-
         return grid;
     }
 
@@ -156,6 +179,7 @@ public class TrackActivity extends VerticalLayout {
         addNewButton.addClickListener(event -> editTrackComponent.editTrack(Track.builder().build()));
         genresButton.addClickListener(event -> showGenresComponent.initComponent());
         authorsButton.addClickListener(event -> showAuthorsComponent.initComponent());
+        albumsButton.addClickListener(event -> showAlbumsComponent.initComponent());
         refreshButton.addClickListener(click -> showTracks(filter.getValue()));
 
         toggleButton.addClickListener(click -> {
@@ -168,7 +192,7 @@ public class TrackActivity extends VerticalLayout {
             }
         });
 
-        toolBar.add(genresButton, authorsButton, addNewButton);
+        toolBar.add(genresButton, authorsButton, albumsButton, addNewButton);
         toolBar.addAndExpand(filter);
         toolBar.add(refreshButton, toggleButton);
         toolBar.setAlignSelf(FlexComponent.Alignment.STRETCH, filter);
