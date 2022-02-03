@@ -10,7 +10,7 @@ with [Vaadin](https://vaadin.com/)
 for building UI.
 
 It was built for educational purpose helping with understanding basic principles and syntax of Spring, JPA, Vaadin, MVC
-pattern and Validation.
+pattern, Validation and Caching.
 
 Provides basic CRUD operations with
 [Tracks](https://github.com/dm4nk/track_library_vaadin/blob/master/src/main/java/com/dm4nk/track_library_vaadin/domain/Track.java)
