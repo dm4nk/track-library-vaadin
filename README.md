@@ -14,8 +14,6 @@ pattern, Validation and Caching.
 
 Provides basic CRUD operations with
 [Tracks](https://github.com/dm4nk/track_library_vaadin/blob/master/src/main/java/com/dm4nk/track_library_vaadin/domain/Track.java)
-and
-[Genres](https://github.com/dm4nk/track_library_vaadin/blob/master/src/main/java/com/dm4nk/track_library_vaadin/domain/Genre.java)
 
 ### Tracks
 
